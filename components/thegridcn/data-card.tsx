@@ -12,14 +12,14 @@ interface DataFieldProps {
 function DataField({ label, value, highlight = false }: DataFieldProps) {
   return (
     <div className="space-y-1">
-      <div className="text-[10px] uppercase tracking-widest text-foreground/80">
+      <div className="text-[10px] uppercase tracking-[0.22em] text-foreground/80 sm:tracking-widest">
         {label}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2">
         <span className="text-primary">|</span>
         <span
           className={cn(
-            "font-mono text-sm uppercase tracking-wide",
+            "min-w-0 flex-1 [overflow-wrap:anywhere] font-mono text-xs leading-relaxed uppercase tracking-[0.14em] sm:text-sm sm:tracking-wide",
             highlight && "bg-primary/20 px-2 py-0.5"
           )}
         >

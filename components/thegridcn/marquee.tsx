@@ -41,14 +41,16 @@ export function Marquee({
         <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.03)_2px,rgba(0,0,0,0.03)_4px)]" />
       )}
 
-      <div className="flex gap-8">
+      <div className="relative h-4 overflow-hidden sm:h-5">
         {[0, 1].map((copy) => (
           <div
             key={copy}
-            className="marquee-track flex shrink-0 items-center gap-8"
+            aria-hidden={copy === 1}
+            className="marquee-track absolute inset-y-0 flex shrink-0 items-center gap-4 pr-4 sm:gap-8 sm:pr-8"
             style={{
               animation: `marqueeScroll ${dur} linear infinite`,
               animationDirection: dir,
+              left: copy === 0 ? "0" : "100%",
             }}
           >
             {children}
@@ -68,11 +70,11 @@ export function Marquee({
 
       {/* Fade edges */}
       <div className={cn(
-        "pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r to-transparent",
+        "pointer-events-none absolute inset-y-0 left-0 w-8 bg-linear-to-r to-transparent sm:w-12",
         variant === "default" ? "from-card/80" : "from-background"
       )} />
       <div className={cn(
-        "pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l to-transparent",
+        "pointer-events-none absolute inset-y-0 right-0 w-8 bg-linear-to-l to-transparent sm:w-12",
         variant === "default" ? "from-card/80" : "from-background"
       )} />
     </div>

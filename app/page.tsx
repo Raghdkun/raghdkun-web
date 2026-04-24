@@ -261,6 +261,7 @@ export default function Home() {
     () => {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce) return;
+      const media = gsap.matchMedia();
 
       // ── Hero title: per-char signal sweep with subtle vertical settle (no fade)
       const titleEl = rootRef.current?.querySelector<HTMLElement>("[data-hero-title]");
@@ -313,6 +314,7 @@ export default function Home() {
       //    for elements that genuinely enter the viewport after mount.)
       ScrollTrigger.batch("[data-reveal]", {
         start: "top 88%",
+        once: true,
         onEnter: (els) => {
           gsap.fromTo(
             els,
@@ -332,6 +334,7 @@ export default function Home() {
       // ── Card reveal: calm rise + edge wipe (no fade, no heavy 3D flip)
       ScrollTrigger.batch("[data-card-reveal]", {
         start: "top 90%",
+        once: true,
         onEnter: (els) => {
           gsap.fromTo(
             els,
@@ -351,6 +354,7 @@ export default function Home() {
       // ── Decode-on-scroll for [data-decode] headings
       ScrollTrigger.batch("[data-decode]", {
         start: "top 88%",
+        once: true,
         onEnter: (els) => els.forEach((el) => decodeReveal(el as HTMLElement)),
       });
 
@@ -375,7 +379,7 @@ export default function Home() {
           fill,
           { width: "0%" },
           {
-            width: target, duration: 1.4, ease: "power3.out",
+            width: target, duration: 1.05, ease: "power2.out",
             scrollTrigger: { trigger: bar, start: "top 92%", once: true },
           },
         );
@@ -386,54 +390,71 @@ export default function Home() {
         const end = Number(el.dataset.counter || "0");
         const obj = { v: 0 };
         gsap.to(obj, {
-          v: end, duration: 1.6, ease: "power2.out",
+          v: end, duration: 1.2, ease: "power2.out",
           scrollTrigger: { trigger: el, start: "top 92%", once: true },
           onUpdate: () => { el.textContent = String(Math.floor(obj.v)); },
         });
       });
 
-      // ── Marquee items: hue shimmer pulse
-      gsap.utils.toArray<HTMLElement>("[data-marquee-item]").forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { color: "rgba(148,163,184,0.6)" },
-          {
-            color: "var(--primary)", duration: 0.6, repeat: -1, yoyo: true,
-            delay: i * 0.12, ease: "sine.inOut",
-          },
-        );
-      });
-
-      // ── Project cards: 3D parallax tilt on hover
-      gsap.utils.toArray<HTMLElement>("[data-project-card]").forEach((card) => {
-        const onMove = (e: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          const x = (e.clientX - rect.left) / rect.width - 0.5;
-          const y = (e.clientY - rect.top) / rect.height - 0.5;
-          gsap.to(card, {
-            rotateY: x * 6, rotateX: -y * 6, transformPerspective: 800,
-            duration: 0.4, ease: "power2.out",
+      media.add("(min-width: 1024px)", () => {
+        gsap.utils.toArray<HTMLElement>(".grid-bg").forEach((grid) => {
+          gsap.to(grid, {
+            backgroundPositionY: "+=140",
+            ease: "none",
+            scrollTrigger: {
+              trigger: grid.parentElement ?? grid,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.4,
+            },
           });
-        };
-        const onLeave = () => gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.6, ease: "power3.out" });
-        card.addEventListener("mousemove", onMove);
-        card.addEventListener("mouseleave", onLeave);
+        });
       });
 
-      // ── Parallax: HUD grid backgrounds drift on scroll
-      gsap.utils.toArray<HTMLElement>(".grid-bg").forEach((g) => {
-        gsap.to(g, {
-          backgroundPositionY: "+=180", ease: "none",
-          scrollTrigger: {
-            trigger: g.parentElement ?? g,
-            start: "top bottom", end: "bottom top", scrub: true,
-          },
+      media.add("(hover: hover) and (pointer: fine) and (min-width: 1024px)", () => {
+        const cleanups: Array<() => void> = [];
+
+        gsap.utils.toArray<HTMLElement>("[data-project-card]").forEach((card) => {
+          gsap.set(card, { transformPerspective: 800, transformStyle: "preserve-3d" });
+
+          const rotateXTo = gsap.quickTo(card, "rotateX", { duration: 0.22, ease: "power2.out" });
+          const rotateYTo = gsap.quickTo(card, "rotateY", { duration: 0.22, ease: "power2.out" });
+
+          const onMove = (event: MouseEvent) => {
+            const rect = card.getBoundingClientRect();
+            const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
+            const offsetY = (event.clientY - rect.top) / rect.height - 0.5;
+
+            rotateYTo(offsetX * 4);
+            rotateXTo(-offsetY * 4);
+          };
+
+          const onLeave = () => {
+            rotateXTo(0);
+            rotateYTo(0);
+          };
+
+          card.addEventListener("mousemove", onMove);
+          card.addEventListener("mouseleave", onLeave);
+
+          cleanups.push(() => {
+            card.removeEventListener("mousemove", onMove);
+            card.removeEventListener("mouseleave", onLeave);
+            gsap.set(card, { clearProps: "rotateX,rotateY,transformPerspective,transformStyle" });
+          });
         });
+
+        return () => cleanups.forEach((cleanup) => cleanup());
       });
 
       // Two-stage refresh: once now, once after layout settles + Lenis attaches
       ScrollTrigger.refresh();
-      gsap.delayedCall(0.3, () => ScrollTrigger.refresh());
+      const delayedRefresh = gsap.delayedCall(0.3, () => ScrollTrigger.refresh());
+
+      return () => {
+        delayedRefresh.kill();
+        media.revert();
+      };
     },
     { scope: rootRef, dependencies: [locale] },
   );
@@ -549,13 +570,13 @@ export default function Home() {
               </div>
 
               <h1
-                className="font-display text-5xl font-bold uppercase leading-[0.9] tracking-tight text-foreground sm:text-7xl lg:text-8xl"
+                className="font-display text-4xl font-bold uppercase leading-[0.9] tracking-tight text-foreground sm:text-6xl lg:text-8xl"
                 aria-label="Raghdkun — Fullstack engineer"
               >
                 <span data-hero-title className="block">{t.hero.title}</span>
                 <span
                   data-hero-subtitle
-                  className="mt-2 block text-primary text-3xl sm:text-5xl lg:text-6xl"
+                  className="mt-2 block text-2xl text-primary sm:text-4xl lg:text-6xl"
                 >
                   {t.hero.subtitle}
                 </span>
@@ -614,12 +635,23 @@ export default function Home() {
 
       {/* ───────── MARQUEE ───────── */}
       <section aria-label="Tech marquee" className="border-y border-primary/20">
-        <Marquee variant="subtle" speed="slow" className="bg-card/40">
+        <div className="flex flex-wrap gap-2 bg-card/40 px-4 py-3 sm:hidden">
+          {t.marquee.map((item, i) => (
+            <span
+              key={`${item}-${i}`}
+              className="rounded border border-primary/15 bg-primary/5 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/60"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+
+        <Marquee variant="subtle" speed="slow" className="hidden bg-card/40 sm:block">
           {t.marquee.map((item, i) => (
             <span
               key={`${item}-${i}`}
               data-marquee-item
-              className="font-mono text-xs uppercase tracking-[0.4em] text-foreground/60"
+              className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/60 sm:text-xs sm:tracking-[0.4em]"
             >
               {item}
             </span>
@@ -920,7 +952,7 @@ function ProjectCard({ project, featured, liveLabel, visitLabel }: ProjectCardPr
       data-project-card
       data-card-reveal
       className={[
-        "group relative flex h-full flex-col overflow-hidden rounded border bg-card/80 backdrop-blur-sm transition-all",
+        "group relative flex h-full min-w-0 flex-col overflow-hidden rounded border bg-card/80 backdrop-blur-sm transition-transform duration-300",
         project.variant === "highlight" ? "border-primary/50" : "border-primary/20",
         featured ? "lg:col-span-2" : "",
       ].join(" ")}
@@ -937,20 +969,18 @@ function ProjectCard({ project, featured, liveLabel, visitLabel }: ProjectCardPr
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.18)_2px,rgba(0,0,0,0.18)_4px)] opacity-50" />
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-t from-background/95 via-background/10 to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 rotate-12 bg-linear-to-r from-transparent via-primary/15 to-transparent opacity-0 transition-all duration-700 group-hover:left-full group-hover:opacity-100" />
-        <div className="absolute left-3 top-3 flex items-center gap-2">
-          <span className="inline-flex h-6 items-center gap-1 rounded border border-primary/40 bg-background/70 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary backdrop-blur">
+        <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
+          <span className="inline-flex h-6 max-w-[calc(100%-4.5rem)] items-center gap-1 truncate rounded border border-primary/40 bg-background/70 px-2 font-mono text-[10px] uppercase tracking-[0.16em] text-primary backdrop-blur sm:max-w-[min(100%,18rem)] sm:tracking-[0.2em]">
             {project.icon}
             {project.copy.tagline}
           </span>
-        </div>
-        {project.url && (
-          <div className="absolute right-3 top-3">
-            <span className="inline-flex h-6 items-center gap-1 rounded border border-primary/40 bg-background/70 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/80 backdrop-blur">
+          {project.url && (
+            <span className="inline-flex h-6 shrink-0 items-center gap-1 rounded border border-primary/40 bg-background/70 px-2 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/80 backdrop-blur sm:tracking-[0.2em]">
               <span className="size-1.5 animate-pulse rounded-full bg-primary" />
               {liveLabel}
             </span>
-          </div>
-        )}
+          )}
+        </div>
         <div className="pointer-events-none absolute left-0 top-0 h-2.5 w-2.5 border-l border-t border-primary/60" />
         <div className="pointer-events-none absolute right-0 top-0 h-2.5 w-2.5 border-r border-t border-primary/60" />
         <div className="pointer-events-none absolute bottom-0 left-0 h-2.5 w-2.5 border-b border-l border-primary/60" />
@@ -958,11 +988,11 @@ function ProjectCard({ project, featured, liveLabel, visitLabel }: ProjectCardPr
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-baseline justify-between gap-3">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-baseline sm:justify-between">
           <h3 className="font-display text-xl font-bold uppercase tracking-wide text-foreground">
             {project.title}
           </h3>
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50">
+          <span className="max-w-full font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/50 sm:text-right sm:tracking-[0.25em]">
             {project.copy.role}
           </span>
         </div>
@@ -997,7 +1027,7 @@ function ProjectCard({ project, featured, liveLabel, visitLabel }: ProjectCardPr
         href={project.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="block min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         {Inner}
       </a>
