@@ -1,26 +1,438 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-playfair: var(--font-playfair);
+  --font-space-mono: var(--font-space-mono);
+  --font-bebas: var(--font-bebas);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base resets ── */
+* {
+  box-sizing: border-box;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0a0a0a;
+  color: #f0ede8;
+  font-family: var(--font-space-mono), monospace;
+  overflow-x: hidden;
+}
+
+@media (hover: hover) {
+  body { cursor: none; }
+  .cursor, .cursor-follower { display: block; }
+}
+
+@media (hover: none) {
+  .cursor, .cursor-follower { display: none; }
+}
+
+/* ── Film grain overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* ── Custom cursor ── */
+.cursor {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background: #f0ede8;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  mix-blend-mode: difference;
+}
+
+.cursor-follower {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(240, 237, 232, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, width 0.4s ease, height 0.4s ease;
+}
+
+/* ── Scroll reveal animations ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Delay classes ── */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+.delay-6 { transition-delay: 0.6s; }
+
+/* ── Cinematic title ── */
+.hero-title {
+  font-family: var(--font-bebas), cursive;
+  letter-spacing: 0.08em;
+  line-height: 0.9;
+}
+
+.playfair {
+  font-family: var(--font-playfair), serif;
+}
+
+/* ── Horizontal marquee ── */
+.marquee-track {
+  display: flex;
+  gap: 4rem;
+  animation: marquee 20s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── Nav line ── */
+nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240, 237, 232, 0.3), transparent);
+}
+
+/* ── Project card hover ── */
+.proj-card {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.proj-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(240, 237, 232, 0.05), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.proj-card:hover::before {
+  opacity: 1;
+}
+
+.proj-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Skill bar animation ── */
+.skill-bar-fill {
+  width: 0%;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skill-bar-fill.animated {
+  width: var(--w);
+}
+
+/* ── Glitch effect ── */
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  animation: glitch1 4s infinite;
+  color: rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+}
+
+.glitch::after {
+  animation: glitch2 4s infinite;
+  color: rgba(255, 255, 255, 0.06);
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+}
+
+@keyframes glitch1 {
+  0%, 90%, 100% { transform: none; }
+  92% { transform: translateX(-3px); }
+  94% { transform: translateX(3px); }
+  96% { transform: translateX(-1px); }
+}
+
+@keyframes glitch2 {
+  0%, 88%, 100% { transform: none; }
+  90% { transform: translateX(3px); }
+  92% { transform: translateX(-3px); }
+  94% { transform: translateX(1px); }
+}
+
+/* ── Scratch lines ── */
+.scratch-line {
+  position: absolute;
+  width: 1px;
+  background: rgba(240, 237, 232, 0.15);
+  animation: scratch 6s linear infinite;
+}
+
+@keyframes scratch {
+  0% { opacity: 0; transform: translateY(-100%); }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(100vh); }
+}
+
+/* ── Vignette ── */
+.vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+  pointer-events: none;
+}
+
+/* ── Button hover ── */
+.btn-cine {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s ease;
+}
+
+.btn-cine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #f0ede8;
+  transform: translateX(-101%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-cine:hover::before {
+  transform: translateX(0);
+}
+
+.btn-cine:hover {
+  color: #0a0a0a;
+}
+
+.btn-cine span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(240, 237, 232, 0.3);
+}
+
+/* ── Section divider ── */
+.film-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.film-divider::before,
+.film-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240, 237, 232, 0.2));
+}
+
+.film-divider::after {
+  background: linear-gradient(90deg, rgba(240, 237, 232, 0.2), transparent);
+}
+
+/* ── Marquee pause on hover ── */
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ── Mobile parallax ── */
+@media (max-width: 768px) {
+  .will-change-transform {
+    will-change: auto;
+  }
+}
+
+/* ── Mobile nav ── */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(240, 237, 232, 0.7);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, width 0.4s ease;
+  transform-origin: left;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translateY(1px); }
+.hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translateY(-1px); }
+
+/* ── Mobile menu overlay ── */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 8, 0.97);
+  z-index: 49;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  backdrop-filter: blur(20px);
+  clip-path: inset(0% 0% 100% 0%);
+  transition: clip-path 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.mobile-menu.open {
+  clip-path: inset(0% 0% 0% 0%);
+  pointer-events: auto;
+}
+.mobile-menu a {
+  font-family: var(--font-bebas), cursive;
+  font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: 0.08em;
+  color: rgba(240, 237, 232, 0.3);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.mobile-menu a:hover {
+  color: #f0ede8;
+  transform: translateX(8px);
+}
+
+/* ── Magnetic button ── */
+.btn-magnetic {
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Scroll indicator ── */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(8px); opacity: 0.8; }
+}
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* ── Stat counter ── */
+.stat-number {
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-number:hover {
+  transform: scale(1.1);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-right, .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .marquee-track { animation: none !important; }
+  .scratch-line { animation: none !important; }
+  .glitch::before, .glitch::after { animation: none !important; }
+  body::before { display: none; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

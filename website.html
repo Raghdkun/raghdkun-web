@@ -1,0 +1,1042 @@
+<!-- @webstudio/inception/1 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Raghdkun — Full Stack Developer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0a0a0a;
+    color: #f0ede8;
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Film grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: #f0ede8;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-follower {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(240,237,232,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.4s ease, height 0.4s ease;
+  }
+
+  /* Scroll animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-80px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(80px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+  /* Delay classes */
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+  .delay-5 { transition-delay: 0.5s; }
+  .delay-6 { transition-delay: 0.6s; }
+
+  /* Cinematic title */
+  .hero-title {
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 0.08em;
+    line-height: 0.9;
+  }
+  .playfair { font-family: 'Playfair Display', serif; }
+
+  /* Horizontal marquee */
+  .marquee-track {
+    display: flex;
+    gap: 4rem;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Nav line */
+  nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,237,232,0.3), transparent);
+  }
+
+  /* Project card hover */
+  .proj-card {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .proj-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(240,237,232,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+  }
+  .proj-card:hover::before { opacity: 1; }
+  .proj-card:hover { transform: translateY(-8px); box-shadow: 0 30px 80px rgba(0,0,0,0.8); }
+
+  /* Skill bar animation */
+  .skill-bar-fill {
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .skill-bar-fill.animated { width: var(--w); }
+
+  /* Glitch effect */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .glitch::before {
+    animation: glitch1 4s infinite;
+    color: rgba(255,255,255,0.08);
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+  .glitch::after {
+    animation: glitch2 4s infinite;
+    color: rgba(255,255,255,0.06);
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: none; }
+    92% { transform: translateX(-3px); }
+    94% { transform: translateX(3px); }
+    96% { transform: translateX(-1px); }
+  }
+  @keyframes glitch2 {
+    0%, 88%, 100% { transform: none; }
+    90% { transform: translateX(3px); }
+    92% { transform: translateX(-3px); }
+    94% { transform: translateX(1px); }
+  }
+
+  /* Scratch lines */
+  .scratch-line {
+    position: absolute;
+    width: 1px;
+    background: rgba(240,237,232,0.15);
+    animation: scratch 6s linear infinite;
+  }
+  @keyframes scratch {
+    0% { opacity: 0; transform: translateY(-100%); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(100vh); }
+  }
+
+  /* Vignette */
+  .vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+  }
+
+  /* Button hover */
+  .btn-cine {
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s ease;
+  }
+  .btn-cine::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #f0ede8;
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-cine:hover::before { transform: translateX(0); }
+  .btn-cine:hover { color: #0a0a0a; }
+  .btn-cine span { position: relative; z-index: 1; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 2px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: rgba(240,237,232,0.3); }
+
+  /* Section divider */
+  .film-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .film-divider::before, .film-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,237,232,0.2));
+  }
+  .film-divider::after {
+    background: linear-gradient(90deg, rgba(240,237,232,0.2), transparent);
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- Film scratch lines -->
+<div class="scratch-line" style="left: 20%; height: 60vh; top: 0; animation-delay: 0s; animation-duration: 8s;"></div>
+<div class="scratch-line" style="left: 75%; height: 40vh; top: 0; animation-delay: 3s; animation-duration: 11s;"></div>
+
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav class="fixed top-0 left-0 w-full z-50 relative" style="background: rgba(10,10,10,0.85); backdrop-filter: blur(20px);">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
+    <a href="#hero" class="flex items-center gap-3 group">
+      <div class="w-8 h-8 border border-white/30 flex items-center justify-center group-hover:border-white/80 transition-colors duration-300">
+        <span class="text-xs font-bold tracking-widest" style="font-family:'Bebas Neue',cursive;">RK</span>
+      </div>
+      <span class="text-xs tracking-[0.3em] text-white/50 group-hover:text-white/80 transition-colors duration-300 hidden sm:block">RAGHDKUN</span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <ul class="hidden md:flex items-center gap-8">
+      <li><a href="#about" class="text-xs tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">ABOUT</a></li>
+      <li><a href="#skills" class="text-xs tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">SKILLS</a></li>
+      <li><a href="#projects" class="text-xs tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">PROJECTS</a></li>
+      <li><a href="#contact" class="text-xs tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">CONTACT</a></li>
+    </ul>
+
+    <!-- CTA -->
+    <a href="https://wa.me/qr/RAGHDKUN" target="_blank"
+       class="btn-cine border border-white/30 px-5 py-2.5 text-xs tracking-[0.2em]">
+      <span>HIRE ME</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO SECTION ═══════════════ -->
+<section id="hero" class="relative min-h-screen flex flex-col justify-center overflow-hidden vignette" style="background: #0a0a0a;">
+
+  <!-- BG image -->
+  <div class="absolute inset-0 opacity-20" style="filter: grayscale(100%) contrast(1.4);">
+    <img src="https://preview.webstudio.ai/cgi/image/dev/df442693ec8610355a0e4e0a03899241482a178b764ddac55b029c1a9ad16a4f.png?width=1344&height=768&format=auto"
+         width="1344" height="768"
+         alt="Film noir developer"
+         class="w-full h-full object-cover" />
+  </div>
+
+  <!-- Scan lines overlay -->
+  <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);"></div>
+
+  <!-- Frame corners -->
+  <div class="absolute top-24 left-8 w-12 h-12 border-l border-t border-white/20"></div>
+  <div class="absolute top-24 right-8 w-12 h-12 border-r border-t border-white/20"></div>
+  <div class="absolute bottom-8 left-8 w-12 h-12 border-l border-b border-white/20"></div>
+  <div class="absolute bottom-8 right-8 w-12 h-12 border-r border-b border-white/20"></div>
+
+  <!-- Film frame numbers -->
+  <div class="absolute left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 opacity-20">
+    <span class="text-xs tracking-widest" style="writing-mode: vertical-rl; font-family:'Space Mono',monospace;">2024</span>
+    <div class="w-px h-20 bg-white/40 mx-auto"></div>
+    <span class="text-xs tracking-widest" style="writing-mode: vertical-rl; font-family:'Space Mono',monospace;">REEL 01</span>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 pt-24">
+
+    <!-- Tag line -->
+    <div class="reveal mb-8 flex items-center gap-4">
+      <div class="w-8 h-px bg-white/50"></div>
+      <span class="text-xs tracking-[0.4em] text-white/50">FULL STACK DEVELOPER</span>
+    </div>
+
+    <!-- Main title -->
+    <div class="overflow-hidden mb-4">
+      <h1 class="hero-title glitch text-white reveal delay-1"
+          data-text="RAGHDKUN"
+          style="font-size: clamp(5rem, 18vw, 18rem); letter-spacing: -0.02em; line-height: 0.85;">
+        RAGHDKUN
+      </h1>
+    </div>
+
+    <!-- Subtitle row -->
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mt-4">
+      <div class="reveal delay-2">
+        <p class="playfair text-xl lg:text-2xl italic text-white/60 max-w-md">
+          Crafting digital experiences that transcend the ordinary —<br/>
+          <span class="text-white/90">Web · Mobile · Full Stack</span>
+        </p>
+      </div>
+      <div class="reveal delay-3 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <a href="https://github.com/Raghdkun" target="_blank"
+           class="btn-cine border border-white/40 px-8 py-4 text-sm tracking-[0.2em] flex items-center gap-3">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>VIEW GITHUB</span>
+        </a>
+        <a href="#contact"
+           class="btn-cine border border-white/20 px-8 py-4 text-sm tracking-[0.2em]">
+          <span>GET IN TOUCH</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="reveal delay-4 mt-16 flex items-center gap-3 opacity-40">
+      <div class="w-px h-12 bg-white animate-pulse"></div>
+      <span class="text-xs tracking-[0.3em] rotate-0">SCROLL</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MARQUEE REEL ═══════════════ -->
+<div class="py-4 border-y border-white/10 overflow-hidden" style="background: #111;">
+  <div class="marquee-track text-white/20 text-xs tracking-[0.3em]">
+    <span>WEB DEVELOPMENT</span><span>·</span>
+    <span>MOBILE APPS</span><span>·</span>
+    <span>FULL STACK</span><span>·</span>
+    <span>REACT</span><span>·</span>
+    <span>NODE.JS</span><span>·</span>
+    <span>FLUTTER</span><span>·</span>
+    <span>UI/UX DESIGN</span><span>·</span>
+    <span>GITHUB PROJECTS</span><span>·</span>
+    <span>API DEVELOPMENT</span><span>·</span>
+    <span>CLOUD SERVICES</span><span>·</span>
+    <span>WEB DEVELOPMENT</span><span>·</span>
+    <span>MOBILE APPS</span><span>·</span>
+    <span>FULL STACK</span><span>·</span>
+    <span>REACT</span><span>·</span>
+    <span>NODE.JS</span><span>·</span>
+    <span>FLUTTER</span><span>·</span>
+    <span>UI/UX DESIGN</span><span>·</span>
+    <span>GITHUB PROJECTS</span><span>·</span>
+    <span>API DEVELOPMENT</span><span>·</span>
+    <span>CLOUD SERVICES</span><span>·</span>
+  </div>
+</div>
+
+<!-- ═══════════════ ABOUT SECTION ═══════════════ -->
+<section id="about" class="py-32 lg:py-40 relative overflow-hidden" style="background: #0d0d0d;">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <!-- Section label -->
+    <div class="film-divider mb-16 reveal">
+      <span class="text-xs tracking-[0.4em] text-white/30 px-4">ACT I — ABOUT</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+      <!-- Image side -->
+      <div class="reveal-left relative">
+        <div class="relative overflow-hidden" style="border-radius: 0 60px 0 60px;">
+          <img src="https://preview.webstudio.ai/cgi/image/dev/8064d257317703c825b9bf004188f10aa65c68c406c5803261ec7de4253d0bf8.png?width=1152&height=768&format=auto"
+               width="1152" height="768"
+               alt="Developer workspace"
+               class="w-full h-auto object-cover opacity-70"
+               style="filter: grayscale(100%) contrast(1.3); mix-blend-mode: luminosity;" />
+          <!-- Overlay frame -->
+          <div class="absolute inset-0 border border-white/10" style="border-radius: 0 60px 0 60px;"></div>
+        </div>
+        <!-- Floating badge -->
+        <div class="absolute -bottom-6 -right-4 lg:-right-8 bg-white text-black px-6 py-4 reveal delay-2">
+          <div class="text-3xl font-bold" style="font-family:'Bebas Neue',cursive;">3+</div>
+          <div class="text-xs tracking-[0.2em]">YEARS EXP</div>
+        </div>
+      </div>
+
+      <!-- Text side -->
+      <div class="space-y-8">
+        <div class="reveal delay-1">
+          <h2 class="playfair text-5xl lg:text-6xl font-bold italic text-white leading-tight">
+            The Story<br/>
+            <span class="not-italic text-white/40">Behind the Code</span>
+          </h2>
+        </div>
+
+        <div class="reveal delay-2 space-y-4 text-white/60 text-sm leading-loose">
+          <p>
+            I'm <strong class="text-white">Raghdkun</strong> — a passionate full stack developer who architects digital worlds from concept to deployment. Every line of code is a deliberate scene in a larger narrative.
+          </p>
+          <p>
+            Specializing in web, mobile, and full stack development, I bring ideas to life with precision, creativity, and relentless attention to detail. From sleek frontends to robust backend systems — I handle it all.
+          </p>
+        </div>
+
+        <div class="reveal delay-3 grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+          <div>
+            <div class="text-2xl font-bold text-white" style="font-family:'Bebas Neue',cursive;">15+</div>
+            <div class="text-xs text-white/30 tracking-wider mt-1">PROJECTS</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white" style="font-family:'Bebas Neue',cursive;">3+</div>
+            <div class="text-xs text-white/30 tracking-wider mt-1">PLATFORMS</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white" style="font-family:'Bebas Neue',cursive;">100%</div>
+            <div class="text-xs text-white/30 tracking-wider mt-1">COMMITTED</div>
+          </div>
+        </div>
+
+        <div class="reveal delay-4">
+          <a href="https://github.com/Raghdkun" target="_blank"
+             class="inline-flex items-center gap-3 text-xs tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300 group">
+            <span>EXPLORE MY GITHUB</span>
+            <svg class="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SKILLS SECTION ═══════════════ -->
+<section id="skills" class="py-32 lg:py-40 relative overflow-hidden" style="background: #0a0a0a;">
+
+  <!-- BG decoration -->
+  <div class="absolute right-0 top-0 w-1/2 h-full opacity-5 pointer-events-none"
+       style="background: radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.3) 0%, transparent 70%);">
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <div class="film-divider mb-16 reveal">
+      <span class="text-xs tracking-[0.4em] text-white/30 px-4">ACT II — SKILLS</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+
+      <!-- Left: Big title + image -->
+      <div>
+        <div class="reveal">
+          <h2 class="hero-title text-white" style="font-size: clamp(4rem, 10vw, 8rem); line-height: 0.9;">
+            CRAFT<br/>
+            <span style="color: rgba(240,237,232,0.2); -webkit-text-stroke: 1px rgba(240,237,232,0.4);">&amp;</span><br/>
+            SKILL
+          </h2>
+        </div>
+        <div class="reveal delay-2 mt-8 relative overflow-hidden" style="border-radius: 40px 0 40px 0;">
+          <img src="https://preview.webstudio.ai/cgi/image/dev/ad7641621999cfe0473ad6e37bc27c8b5eb66831628c3eeffda80542a9b94042.png?width=1408&height=704&format=auto"
+               width="1408" height="704"
+               alt="Neural network skills visualization"
+               class="w-full h-auto opacity-60 object-cover"
+               style="filter: grayscale(100%) contrast(1.4);" />
+          <div class="absolute inset-0" style="background: linear-gradient(to top, #0a0a0a 0%, transparent 60%); border-radius: 40px 0 40px 0;"></div>
+        </div>
+      </div>
+
+      <!-- Right: Skill bars -->
+      <div class="space-y-6">
+        <div class="reveal delay-1">
+          <p class="playfair italic text-white/50 text-lg mb-8">
+            "A developer's toolkit is their <em class="text-white">director's lens</em> — each technology a different perspective."
+          </p>
+        </div>
+
+        <!-- Skill bars -->
+        <div class="space-y-5" id="skillsContainer">
+
+          <div class="reveal delay-1 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">REACT / NEXT.JS</span>
+              <span class="text-xs text-white/30">90%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 90%;"></div>
+            </div>
+          </div>
+
+          <div class="reveal delay-2 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">NODE.JS / EXPRESS</span>
+              <span class="text-xs text-white/30">85%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 85%;"></div>
+            </div>
+          </div>
+
+          <div class="reveal delay-3 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">FLUTTER / DART</span>
+              <span class="text-xs text-white/30">80%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 80%;"></div>
+            </div>
+          </div>
+
+          <div class="reveal delay-4 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">JAVASCRIPT / TYPESCRIPT</span>
+              <span class="text-xs text-white/30">92%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 92%;"></div>
+            </div>
+          </div>
+
+          <div class="reveal delay-5 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">DATABASES (SQL / NoSQL)</span>
+              <span class="text-xs text-white/30">78%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 78%;"></div>
+            </div>
+          </div>
+
+          <div class="reveal delay-6 skill-item">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs tracking-[0.2em] text-white/70">UI/UX &amp; DESIGN SYSTEMS</span>
+              <span class="text-xs text-white/30">75%</span>
+            </div>
+            <div class="h-px bg-white/10 relative overflow-hidden">
+              <div class="skill-bar-fill h-full bg-white absolute top-0 left-0" style="--w: 75%;"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tech tags -->
+        <div class="reveal delay-4 flex flex-wrap gap-2 pt-6 border-t border-white/10">
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">PYTHON</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">DOCKER</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">AWS</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">GIT</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">FIREBASE</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">REST API</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">GRAPHQL</span>
+          <span class="px-3 py-1 border border-white/20 text-xs text-white/50 tracking-wider hover:border-white/60 hover:text-white transition-all duration-300">TAILWIND</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROJECTS SECTION ═══════════════ -->
+<section id="projects" class="py-32 lg:py-40" style="background: #0d0d0d;">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <div class="film-divider mb-6 reveal">
+      <span class="text-xs tracking-[0.4em] text-white/30 px-4">ACT III — PROJECTS</span>
+    </div>
+
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
+      <h2 class="hero-title text-white reveal" style="font-size: clamp(3rem, 8vw, 7rem); line-height: 0.9;">
+        SELECTED<br/>
+        <span style="-webkit-text-stroke: 1px rgba(240,237,232,0.3); color: transparent;">WORKS</span>
+      </h2>
+      <a href="https://github.com/Raghdkun" target="_blank"
+         class="reveal delay-2 btn-cine border border-white/30 px-6 py-3 text-xs tracking-[0.2em] self-start lg:self-end flex items-center gap-2">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>ALL REPOSITORIES</span>
+      </a>
+    </div>
+
+    <!-- Projects grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+
+      <!-- Loading state / GitHub projects placeholder -->
+      <div class="proj-card reveal delay-1 border border-white/10 p-6 flex flex-col justify-between min-h-64" style="background: #111;">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="text-xs text-white/40 tracking-wider">REPOSITORY</span>
+            </div>
+            <span class="text-xs text-white/20">01</span>
+          </div>
+          <h3 class="playfair text-xl text-white mb-3 italic" id="proj-1-name">Loading...</h3>
+          <p class="text-xs text-white/40 leading-relaxed" id="proj-1-desc">Fetching repository details from GitHub...</p>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-1-lang">
+              <span class="w-2 h-2 rounded-full bg-white/30 inline-block"></span>
+              <span>—</span>
+            </span>
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-1-stars">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+          <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/30 hover:text-white transition-colors duration-300 flex items-center gap-2">
+            VIEW <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="proj-card reveal delay-2 border border-white/10 p-6 flex flex-col justify-between min-h-64" style="background: #111;">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="text-xs text-white/40 tracking-wider">REPOSITORY</span>
+            </div>
+            <span class="text-xs text-white/20">02</span>
+          </div>
+          <h3 class="playfair text-xl text-white mb-3 italic" id="proj-2-name">Loading...</h3>
+          <p class="text-xs text-white/40 leading-relaxed" id="proj-2-desc">Fetching repository details from GitHub...</p>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-2-lang">
+              <span class="w-2 h-2 rounded-full bg-white/30 inline-block"></span>
+              <span>—</span>
+            </span>
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-2-stars">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+          <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/30 hover:text-white transition-colors duration-300 flex items-center gap-2">
+            VIEW <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="proj-card reveal delay-3 border border-white/10 p-6 flex flex-col justify-between min-h-64" style="background: #111;">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="text-xs text-white/40 tracking-wider">REPOSITORY</span>
+            </div>
+            <span class="text-xs text-white/20">03</span>
+          </div>
+          <h3 class="playfair text-xl text-white mb-3 italic" id="proj-3-name">Loading...</h3>
+          <p class="text-xs text-white/40 leading-relaxed" id="proj-3-desc">Fetching repository details from GitHub...</p>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-3-lang">
+              <span class="w-2 h-2 rounded-full bg-white/30 inline-block"></span>
+              <span>—</span>
+            </span>
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-3-stars">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+          <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/30 hover:text-white transition-colors duration-300 flex items-center gap-2">
+            VIEW <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="proj-card reveal delay-4 border border-white/10 p-6 flex flex-col justify-between min-h-64" style="background: #111;">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="text-xs text-white/40 tracking-wider">REPOSITORY</span>
+            </div>
+            <span class="text-xs text-white/20">04</span>
+          </div>
+          <h3 class="playfair text-xl text-white mb-3 italic" id="proj-4-name">Loading...</h3>
+          <p class="text-xs text-white/40 leading-relaxed" id="proj-4-desc">Fetching repository details from GitHub...</p>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-4-lang">
+              <span class="w-2 h-2 rounded-full bg-white/30 inline-block"></span>
+              <span>—</span>
+            </span>
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-4-stars">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+          <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/30 hover:text-white transition-colors duration-300 flex items-center gap-2">
+            VIEW <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="proj-card reveal delay-5 border border-white/10 p-6 flex flex-col justify-between min-h-64" style="background: #111;">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="text-xs text-white/40 tracking-wider">REPOSITORY</span>
+            </div>
+            <span class="text-xs text-white/20">05</span>
+          </div>
+          <h3 class="playfair text-xl text-white mb-3 italic" id="proj-5-name">Loading...</h3>
+          <p class="text-xs text-white/40 leading-relaxed" id="proj-5-desc">Fetching repository details from GitHub...</p>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-5-lang">
+              <span class="w-2 h-2 rounded-full bg-white/30 inline-block"></span>
+              <span>—</span>
+            </span>
+            <span class="flex items-center gap-1 text-xs text-white/30" id="proj-5-stars">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>0</span>
+            </span>
+          </div>
+          <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/30 hover:text-white transition-colors duration-300 flex items-center gap-2">
+            VIEW <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- GitHub CTA Card -->
+      <div class="proj-card reveal delay-6 border border-white/20 p-6 flex flex-col items-center justify-center min-h-64 text-center group cursor-pointer"
+           onclick="window.open('https://github.com/Raghdkun','_blank')">
+        <div class="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mb-4 group-hover:border-white/60 transition-colors duration-500">
+          <svg class="w-7 h-7 text-white/40 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </div>
+        <p class="playfair italic text-white/40 group-hover:text-white/70 transition-colors duration-300 text-sm">See all repositories</p>
+        <p class="text-xs tracking-[0.3em] text-white/20 mt-2">github.com/Raghdkun</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CINEMATIC INTERLUDE ═══════════════ -->
+<section class="py-20 relative overflow-hidden" style="background: #080808;">
+  <div class="absolute inset-0 opacity-15" style="filter: grayscale(100%);">
+    <img src="https://preview.webstudio.ai/cgi/image/dev/a737a5ba89d72d1d978a7fedde23378fea4a3f01f18d365507ffbd1309af4784.png?width=1152&height=640&format=auto"
+         width="1152" height="640"
+         alt="Developer workspace"
+         class="w-full h-full object-cover" />
+  </div>
+  <div class="absolute inset-0" style="background: linear-gradient(to right, #080808 0%, rgba(8,8,8,0.3) 50%, #080808 100%);"></div>
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+    <div class="reveal">
+      <blockquote class="playfair text-3xl lg:text-5xl text-white/90 italic leading-tight font-light">
+        "Code is the poetry of<br/>
+        <span class="not-italic font-bold text-white">the modern era."</span>
+      </blockquote>
+      <div class="mt-6 flex items-center justify-center gap-4">
+        <div class="w-12 h-px bg-white/30"></div>
+        <span class="text-xs tracking-[0.4em] text-white/30">RAGHDKUN</span>
+        <div class="w-12 h-px bg-white/30"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONTACT SECTION ═══════════════ -->
+<section id="contact" class="py-32 lg:py-40 relative overflow-hidden" style="background: #0d0d0d;">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+
+    <div class="film-divider mb-16 reveal">
+      <span class="text-xs tracking-[0.4em] text-white/30 px-4">FINAL ACT — CONTACT</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: Big text -->
+      <div>
+        <div class="reveal">
+          <h2 class="hero-title text-white" style="font-size: clamp(3.5rem, 10vw, 9rem); line-height: 0.85;">
+            LET'S<br/>
+            MAKE<br/>
+            <span style="-webkit-text-stroke: 1px rgba(240,237,232,0.4); color: transparent;">MAGIC</span>
+          </h2>
+        </div>
+        <div class="reveal delay-2 mt-8">
+          <p class="playfair italic text-white/50 text-lg max-w-sm leading-relaxed">
+            Ready to bring your vision to life? Let's write the next chapter together.
+          </p>
+        </div>
+
+        <!-- Film strip decoration -->
+        <div class="reveal delay-3 mt-12 flex gap-1">
+          <div class="w-1 h-24 bg-white/5 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/10 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/5 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/15 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/5 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/10 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/5 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/20 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/5 border border-white/10"></div>
+          <div class="w-1 h-24 bg-white/10 border border-white/10"></div>
+        </div>
+      </div>
+
+      <!-- Right: Contact options -->
+      <div class="space-y-6">
+
+        <!-- WhatsApp CTA - Primary -->
+        <a href="https://wa.me/message/RAGHDKUN" target="_blank"
+           class="reveal delay-1 group block border border-white/20 p-8 hover:border-white/60 transition-all duration-500 relative overflow-hidden"
+           style="background: linear-gradient(135deg, #1a1a1a, #0d0d0d);">
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+               style="background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);"></div>
+          <div class="relative flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <svg class="w-6 h-6 text-white/70" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                <span class="text-xs tracking-[0.3em] text-white/50">WHATSAPP</span>
+              </div>
+              <h3 class="playfair text-2xl italic text-white mb-1">Message Me</h3>
+              <p class="text-xs text-white/30">Available for new projects</p>
+            </div>
+            <svg class="w-6 h-6 text-white/30 group-hover:text-white group-hover:translate-x-2 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- GitHub -->
+        <a href="https://github.com/Raghdkun" target="_blank"
+           class="reveal delay-2 group block border border-white/10 p-8 hover:border-white/40 transition-all duration-500"
+           style="background: #111;">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <svg class="w-6 h-6 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span class="text-xs tracking-[0.3em] text-white/30">GITHUB</span>
+              </div>
+              <h3 class="playfair text-2xl italic text-white/80 mb-1">Explore My Work</h3>
+              <p class="text-xs text-white/30">github.com/Raghdkun</p>
+            </div>
+            <svg class="w-6 h-6 text-white/20 group-hover:text-white/60 group-hover:translate-x-2 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Availability badge -->
+        <div class="reveal delay-3 flex items-center gap-3 px-2">
+          <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+          <span class="text-xs tracking-[0.2em] text-white/40">AVAILABLE FOR FREELANCE &amp; FULL-TIME</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="border-t border-white/10 py-10" style="background: #080808;">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 border border-white/20 flex items-center justify-center">
+          <span class="text-xs font-bold" style="font-family:'Bebas Neue',cursive;">RK</span>
+        </div>
+        <span class="text-xs tracking-[0.3em] text-white/30">RAGHDKUN</span>
+      </div>
+      <p class="text-xs text-white/20 text-center">
+        &copy; 2024 — Crafted with cinematic precision
+      </p>
+      <div class="flex items-center gap-6">
+        <a href="https://github.com/Raghdkun" target="_blank" class="text-xs tracking-wider text-white/20 hover:text-white/60 transition-colors duration-300">GITHUB</a>
+        <a href="https://wa.me/message/RAGHDKUN" target="_blank" class="text-xs tracking-wider text-white/20 hover:text-white/60 transition-colors duration-300">WHATSAPP</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const cursorFollower = document.getElementById('cursorFollower');
+let mouseX = 0, mouseY = 0;
+let followerX = 0, followerY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursor.style.left = mouseX + 'px';
+  cursor.style.top = mouseY + 'px';
+});
+
+function animateFollower() {
+  followerX += (mouseX - followerX) * 0.08;
+  followerY += (mouseY - followerY) * 0.08;
+  cursorFollower.style.left = followerX + 'px';
+  cursorFollower.style.top = followerY + 'px';
+  requestAnimationFrame(animateFollower);
+}
+animateFollower();
+
+document.querySelectorAll('a, button, .proj-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '20px';
+    cursor.style.height = '20px';
+    cursorFollower.style.width = '60px';
+    cursorFollower.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px';
+    cursor.style.height = '12px';
+    cursorFollower.style.width = '40px';
+    cursorFollower.style.height = '40px';
+  });
+});
+
+// ---- Intersection Observer for scroll reveal ----
+const observerOptions = { threshold: 0.12, rootMargin: '0px 0px -50px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Trigger skill bars
+      if (entry.target.classList.contains('skill-item')) {
+        const bar = entry.target.querySelector('.skill-bar-fill');
+        if (bar) setTimeout(() => bar.classList.add('animated'), 200);
+      }
+      observer.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .skill-item').forEach(el => {
+  observer.observe(el);
+});
+
+// ---- Parallax hero on scroll ----
+const heroImg = document.querySelector('#hero .absolute.inset-0 img');
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  if (heroImg && scrollY < window.innerHeight) {
+    heroImg.style.transform = 'translateY(' + scrollY * 0.3 + 'px)';
+  }
+}, { passive: true });
+
+// ---- GitHub API: fetch real repos ----
+async function loadGitHubRepos() {
+  try {
+    const res = await fetch('https://api.github.com/users/Raghdkun/repos?sort=updated&per_page=5&type=public');
+    if (!res.ok) throw new Error('GitHub API error');
+    const repos = await res.json();
+    const langColors = {
+      'JavaScript': '#f1e05a', 'TypeScript': '#3178c6', 'Python': '#3572A5',
+      'Dart': '#00B4AB', 'HTML': '#e34c26', 'CSS': '#563d7c', 'Vue': '#42b883',
+      'Java': '#b07219', 'Kotlin': '#A97BFF', 'Swift': '#ffac45', 'PHP': '#4F5D95',
+      'Ruby': '#701516', 'Go': '#00ADD8', 'C#': '#178600', 'C++': '#f34b7d',
+      'Shell': '#89e051', 'default': '#888'
+    };
+    repos.slice(0, 5).forEach((repo, i) => {
+      const idx = i + 1;
+      const nameEl = document.getElementById('proj-' + idx + '-name');
+      const descEl = document.getElementById('proj-' + idx + '-desc');
+      const langEl = document.getElementById('proj-' + idx + '-lang');
+      const starsEl = document.getElementById('proj-' + idx + '-stars');
+      if (nameEl) nameEl.textContent = repo.name;
+      if (descEl) descEl.textContent = repo.description || 'A curated repository pushing the boundaries of code.';
+      if (langEl) {
+        const color = langColors[repo.language] || langColors['default'];
+        langEl.innerHTML = '<span class="w-2 h-2 rounded-full inline-block" style="background:' + color + ';"></span> ' + (repo.language || '—');
+      }
+      if (starsEl) {
+        starsEl.innerHTML = '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ' + repo.stargazers_count;
+        // Update view link
+        const card = starsEl.closest('.proj-card');
+        if (card) {
+          const link = card.querySelector('a');
+          if (link) link.href = repo.html_url;
+        }
+      }
+    });
+  } catch (e) {
+    // Fallback: static placeholder data
+    const fallback = [
+      { name: 'Portfolio Website', desc: 'A cinematic portfolio with noir aesthetics.', lang: 'JavaScript', stars: 5 },
+      { name: 'Mobile App', desc: 'Cross-platform mobile application built with Flutter.', lang: 'Dart', stars: 3 },
+      { name: 'Full Stack API', desc: 'RESTful API with Node.js, Express and MongoDB.', lang: 'JavaScript', stars: 8 },
+      { name: 'React Dashboard', desc: 'Admin dashboard with real-time data visualization.', lang: 'TypeScript', stars: 12 },
+      { name: 'E-Commerce Platform', desc: 'Complete online store with payment integration.', lang: 'JavaScript', stars: 7 },
+    ];
+    fallback.forEach((repo, i) => {
+      const idx = i + 1;
+      const nameEl = document.getElementById('proj-' + idx + '-name');
+      const descEl = document.getElementById('proj-' + idx + '-desc');
+      const langEl = document.getElementById('proj-' + idx + '-lang');
+      const starsEl = document.getElementById('proj-' + idx + '-stars');
+      if (nameEl) nameEl.textContent = repo.name;
+      if (descEl) descEl.textContent = repo.desc;
+      if (langEl) langEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-white/50 inline-block"></span> ' + repo.lang;
+      if (starsEl) starsEl.innerHTML = '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ' + repo.stars;
+    });
+  }
+}
+loadGitHubRepos();
+
+// ---- Nav active on scroll ----
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 80) {
+    nav.style.background = 'rgba(8,8,8,0.97)';
+  } else {
+    nav.style.background = 'rgba(10,10,10,0.85)';
+  }
+}, { passive: true });
+</script>
+</body>
+</html>

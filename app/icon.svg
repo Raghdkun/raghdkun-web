@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#0a0a0a"/>
+  <rect x="1" y="1" width="30" height="30" fill="none" stroke="#ffffff" stroke-width="0.75" opacity="0.25"/>
+  <line x1="1" y1="1" x2="4" y2="1" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="1" y1="1" x2="1" y2="4" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="28" y1="1" x2="31" y2="1" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="31" y1="1" x2="31" y2="4" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="1" y1="31" x2="4" y2="31" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="1" y1="28" x2="1" y2="31" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="28" y1="31" x2="31" y2="31" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <line x1="31" y1="28" x2="31" y2="31" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+  <!-- R - Bebas Neue inspired: tall, condensed, geometric -->
+  <path d="M5.5 7 L5.5 25 L8.5 25 L8.5 18 L10 18 L12.5 25 L15.8 25 L12.8 17.5 C14 17 14.8 15.8 14.8 14 L14.8 11 C14.8 8.5 13.2 7 10.8 7 Z M8.5 9.5 L10.2 9.5 C11.4 9.5 12 10.2 12 11.3 L12 14 C12 15.1 11.4 15.8 10.2 15.8 L8.5 15.8 Z" fill="#f0f0f0"/>
+  <!-- K - Bebas Neue inspired: tall, condensed, geometric with sharp diagonals -->
+  <path d="M17 7 L17 25 L20 25 L20 17.8 L21.2 16 L24.5 25 L27.8 25 L23.2 14.2 L27.2 7 L24 7 L20 14.5 L20 7 Z" fill="#f0f0f0"/>
+</svg>
