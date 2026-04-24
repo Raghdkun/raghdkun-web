@@ -1,0 +1,250 @@
+plan_id: audit-enhance-2026-03-21
+objective: >
+  Research the mobile navigation close button (X), stats/years section, and GitHub username
+  in the codebase to identify display issues and understand data structures.
+focus_area: nav-close-button, stats-section, github-username
+created_at: "2026-03-22"
+created_by: researcher
+status: completed
+
+tldr: |
+  - GitHub username is **Raghdkun** (used in GITHUB_URL constant and multiple href links throughout page.tsx)
+  - The mobile nav close button (X) is implemented as a CSS-only hamburger-to-X transform on 3 <span> elements. The **critical display issue** is that the hamburger spans are only 1px tall and use transform-origin: left, causing the X cross to appear off-center and nearly invisible due to insufficient visual weight.
+  - Stats section has 4 hardcoded counters: "3+" years, "15+" projects, "3+" platforms, "100%" committed — all using GSAP counter animation with data-target attributes.
+  - The "3+ YEARS EXP" badge is a separate element from the counter grid; replacing values with live GitHub data requires changing both the badge and the counter grid.
+
+research_metadata:
+  methodology: "Hybrid retrieval: read_file for full file contents of page.tsx, globals.css, layout.tsx"
+  scope: "app/page.tsx (full), app/globals.css (full), app/layout.tsx (full)"
+  confidence: high
+  coverage: 100
+
+files_analyzed:
+  - file: page.tsx
+    path: app/page.tsx
+    purpose: Main page component with all sections (nav, hero, about/stats, skills, projects, contact)
+    key_elements:
+      - element: GITHUB_URL
+        type: variable
+        location: "app/page.tsx:12"
+        description: 'const GITHUB_URL = "https://github.com/Raghdkun"'
+      - element: mobileMenuOpen state
+        type: variable
+        location: "app/page.tsx:119"
+        description: "useState(false) controlling mobile menu visibility"
+      - element: hamburger button
+        type: pattern
+        location: "app/page.tsx:753-766"
+        description: >
+          Button with className `hamburger ${mobileMenuOpen ? 'open' : ''}` containing 3 empty <span/> elements.
+          Toggles mobileMenuOpen state on click. Has aria-label, aria-expanded, aria-controls.
+      - element: mobile-menu overlay
+        type: pattern
+        location: "app/page.tsx:769-793"
+        description: >
+          Div with className `mobile-menu ${mobileMenuOpen ? 'open' : ''}`.
+          Contains nav links (ABOUT, SKILLS, PROJECTS, CONTACT) and HIRE ME button.
+          Has decorative frame corners. Each link calls setMobileMenuOpen(false) on click.
+      - element: "3+ YEARS EXP" badge
+        type: pattern
+        location: "app/page.tsx:968-971"
+        description: >
+          Positioned absolutely at bottom-right of the about image.
+          <div className="text-3xl font-bold hero-title">3+</div>
+          <div className="text-xs tracking-[0.2em]">YEARS EXP</div>
+          Hardcoded value "3+".
+      - element: stats counter grid
+        type: pattern
+        location: "app/page.tsx:991-1007"
+        description: >
+          Grid with 3 columns inside counterRef div. Uses GSAP counter animation.
+          - PROJECTS: data-target="15", data-suffix="+"
+          - PLATFORMS: data-target="3", data-suffix="+"
+          - COMMITTED: data-target="100", data-suffix="%"
+      - element: GitHub API fetch
+        type: pattern
+        location: "app/page.tsx:123-137"
+        description: >
+          Fetches from "https://api.github.com/users/Raghdkun/repos?sort=updated&per_page=5&type=public".
+          Falls back to fallbackRepos on error. Used for projects section.
+    language: TypeScript (TSX)
+    lines: 1300+
+
+  - file: globals.css
+    path: app/globals.css
+    purpose: Global CSS with all custom styles, animations, and mobile nav styling
+    key_elements:
+      - element: hamburger base styles
+        type: pattern
+        location: "app/globals.css:355-364"
+        description: |
+          .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+          }
+          .hamburger span {
+            display: block;
+            width: 24px;
+            height: 1px;  /* <--- ISSUE: only 1px tall */
+            background: rgba(240, 237, 232, 0.7);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, width 0.4s ease;
+            transform-origin: left;  /* <--- ISSUE: transforms from left edge */
+          }
+      - element: hamburger open (X) state
+        type: pattern
+        location: "app/globals.css:367-369"
+        description: |
+          .hamburger.open span:nth-child(1) { transform: rotate(45deg) translateY(1px); }
+          .hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+          .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translateY(-1px); }
+      - element: mobile-menu overlay
+        type: pattern
+        location: "app/globals.css:372-395"
+        description: |
+          .mobile-menu uses clip-path animation for reveal.
+          clip-path: inset(0% 0% 100% 0%) when closed → inset(0% 0% 0% 0%) when open.
+          z-index: 51, position: fixed, inset: 0.
+      - element: mobile-menu small screen override
+        type: pattern
+        location: "app/globals.css:412-418"
+        description: |
+          @media (max-width: 640px) {
+            .mobile-menu { justify-content: flex-start; }
+            .mobile-menu a { font-size: clamp(2rem, 9vw, 3rem); }
+          }
+      - element: stat-number styles
+        type: pattern
+        location: "app/globals.css:421-427"
+        description: |
+          .stat-number { display: inline-block; transition: transform 0.5s; }
+          .stat-number:hover { transform: scale(1.1); }
+    language: CSS
+    lines: 445
+
+  - file: layout.tsx
+    path: app/layout.tsx
+    purpose: Root layout with font definitions, metadata, and SmoothScroller wrapper
+    key_elements:
+      - element: metadata
+        type: variable
+        location: "app/layout.tsx:42-67"
+        description: "Title: 'Raghdkun — Full Stack Developer', domain: raghdkun.dev"
+    language: TypeScript (TSX)
+    lines: 85
+
+patterns_found:
+  - category: architecture
+    pattern: "CSS-only hamburger-to-X animation"
+    description: >
+      The hamburger/X toggle is implemented purely with CSS transforms on 3 <span> elements.
+      No SVG icons are used. The open state rotates span 1 by +45deg, hides span 2,
+      and rotates span 3 by -45deg — forming an X shape.
+    examples:
+      - file: globals.css
+        location: "app/globals.css:355-369"
+        snippet: |
+          .hamburger span { width: 24px; height: 1px; background: rgba(240,237,232,0.7); transform-origin: left; }
+          .hamburger.open span:nth-child(1) { transform: rotate(45deg) translateY(1px); }
+          .hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+          .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translateY(-1px); }
+    prevalence: common
+
+  - category: architecture
+    pattern: "GSAP counter animation for stats"
+    description: >
+      Stats use data-target and data-suffix HTML attributes. GSAP animates a counter object
+      from 0 to target value on scroll, updating textContent via onUpdate callback.
+      ScrollTrigger fires once when counterRef enters viewport at 80%.
+    examples:
+      - file: page.tsx
+        location: "app/page.tsx:633-651"
+        snippet: |
+          const statEls = counterRef.current.querySelectorAll<HTMLElement>(".stat-number");
+          statEls.forEach((el) => {
+            const target = parseInt(el.getAttribute("data-target") || "0", 10);
+            const suffix = el.getAttribute("data-suffix") || "";
+            gsap.to(counter, { val: target, ... onUpdate: () => { el.textContent = Math.round(counter.val) + suffix; } });
+          });
+    prevalence: common
+
+  - category: naming
+    pattern: "GitHub username: Raghdkun"
+    description: >
+      The GitHub username "Raghdkun" appears in:
+      - Line 12: const GITHUB_URL = "https://github.com/Raghdkun"
+      - Line 123: fetch URL "https://api.github.com/users/Raghdkun/repos..."
+      - Line 53-57: fallbackRepos html_url values
+      - Line 1013: href="https://github.com/Raghdkun"
+      - Line 1144-1149: "ALL REPOSITORIES" link
+      - Line 1228: "github.com/Raghdkun" text in CTA card
+    examples:
+      - file: page.tsx
+        location: "app/page.tsx:12"
+        snippet: 'const GITHUB_URL = "https://github.com/Raghdkun";'
+    prevalence: common
+
+open_questions:
+  - question: "Is the 1px height on hamburger spans intentional for an ultra-thin aesthetic, or a bug?"
+    context: >
+      At 1px height, the X formed by rotation is extremely thin and nearly invisible,
+      especially on mobile screens. Most hamburger implementations use 2-3px height.
+  - question: "Should the nav hamburger z-index be higher than the mobile-menu overlay?"
+    context: >
+      Nav is z-[52], mobile-menu overlay is z-51. This means the hamburger button sits
+      above the overlay — which is correct for closing. But the hamburger button is inside
+      the nav, not re-rendered inside the overlay, so users must tap the nav-bar area to close.
+  - question: "What GitHub API data should replace the hardcoded stats?"
+    context: >
+      The user wants years and project count from real GitHub data. The GitHub API
+      users endpoint provides created_at (for years calculation) and public_repos count.
+      Currently only the repos endpoint is called for the projects section.
+
+gaps:
+  - area: "X button display issues"
+    description: |
+      **Multiple issues identified with the X close button:**
+
+      1. **1px span height**: The hamburger spans are `height: 1px` (globals.css line 361).
+         When rotated 45deg/-45deg to form X, the resulting cross is only 1px thick — nearly
+         invisible on mobile devices. Standard implementations use 2-3px.
+
+      2. **transform-origin: left**: The spans use `transform-origin: left` (globals.css line 364).
+         This causes the rotation pivot to be at the left edge of each span, making the X
+         shape asymmetric and shifted to the left rather than forming a centered cross.
+         A centered X typically uses `transform-origin: center` or carefully calculated
+         translate values to compensate.
+
+      3. **translateY values too small**: The open state uses `translateY(1px)` and
+         `translateY(-1px)` (globals.css lines 367-369). With a gap of 5px between spans
+         and transform-origin: left, these tiny translate values don't properly converge
+         the two rotated lines into a proper centered X cross.
+
+      4. **Low opacity background**: The spans use `rgba(240, 237, 232, 0.7)` — only 70%
+         opacity on an already thin 1px line, further reducing visibility.
+
+      5. **No explicit close button in the overlay**: The mobile-menu overlay itself has
+         no dedicated close button or X icon. Closing relies entirely on the hamburger
+         button in the nav bar above (which transforms to X state). If the nav bar is
+         visually merged with the overlay background, the X becomes hard to find.
+    impact: >
+      Users cannot easily see or identify the close button when the mobile menu is open.
+      The 1px-thin, left-pivoted, low-opacity X is functionally invisible on many devices.
+
+  - area: "Stats data source"
+    description: |
+      All stat values are hardcoded:
+      - "3+" years experience (about image badge, line 968)
+      - "15+" projects (counter grid, line 994, data-target="15")
+      - "3+" platforms (counter grid, line 998, data-target="3")
+      - "100%" committed (counter grid, line 1003, data-target="100")
+
+      To make years/projects dynamic from GitHub:
+      - Years: fetch https://api.github.com/users/Raghdkun → created_at → calculate years since
+      - Projects: fetch same endpoint → public_repos count
+      - The existing repos fetch (line 123) only gets repo list, not user profile data
+    impact: >
+      Stats become stale over time. Adding a GitHub user API call would keep years and
+      project count accurate automatically.

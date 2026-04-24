@@ -109,7 +109,9 @@ export default class ErrorBoundary extends Component<Props, State> {
                 wordBreak: "break-word",
               }}
             >
-              {this.state.error?.message || "Unknown error"}
+              {process.env.NODE_ENV === "development"
+                ? this.state.error?.message || "Unknown error"
+                : "An unexpected error occurred."}
             </p>
 
             {/* Action buttons */}

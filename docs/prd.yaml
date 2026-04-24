@@ -1,0 +1,57 @@
+prd_id: raghdkun-portfolio
+version: "0.2.0"
+status: draft
+
+features:
+  - name: SEO metadata hardening
+    overview: Complete viewport, og:image, and twitter card metadata in layout.tsx
+    status: planned
+
+  - name: CSS cleanup
+    overview: Remove dead reveal/delay classes, fix film grain z-index, clean @theme variables
+    status: planned
+
+  - name: Dependency hygiene
+    overview: Remove unused @react-three/* packages, add GitHub image remote patterns
+    status: planned
+
+  - name: Page runtime bug fixes
+    overview: Fix duplicate React keys, cursor initial position, hero image format, memoization
+    status: planned
+
+  - name: Accessibility baseline
+    overview: Skip-nav, focus-visible, aria-labels on SVGs/nav/contact links
+    status: planned
+
+  - name: Error boundary production safety
+    overview: Hide raw error.message in production builds
+    status: planned
+
+  - name: GSAP lifecycle modernization
+    overview: Migrate main useEffect to useGSAP hook for cleaner animation cleanup
+    status: planned
+
+state_machines: []
+
+errors:
+  - code: ERR_BOUNDARY_001
+    message: "An unexpected error occurred. Please try again."
+
+decisions:
+  - decision: Keep monolithic "use client" page.tsx architecture
+    rationale: |
+      GSAP + ScrollTrigger + Lenis require client-side DOM access throughout the page.
+      Splitting into server components would require major refactoring with high risk
+      and minimal SSR benefit for a single-page portfolio.
+  - decision: Lower film grain z-index to 50 instead of removing it
+    rationale: |
+      Film grain is a deliberate design choice. z-index:50 keeps it above normal content
+      but below modals, menus, and accessibility overlays.
+  - decision: Use useGSAP hook from @gsap/react instead of raw useEffect
+    rationale: |
+      The package is already installed. useGSAP provides automatic cleanup and
+      proper GSAP context management, reducing memory leak risk.
+
+changes:
+  - version: "0.2.0"
+    change: Initial PRD created from audit-enhance-2026-03-21 plan

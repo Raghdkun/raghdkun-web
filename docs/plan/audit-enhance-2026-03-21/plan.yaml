@@ -1,0 +1,588 @@
+plan_id: audit-enhance-2026-03-21
+objective: |
+  Fix layout issues, improve styling, accessibility, performance, and component quality
+  for the raghdkun Next.js portfolio app based on comprehensive audit findings.
+  Focus on high-impact in-place fixes within the existing "use client" architecture —
+  no server component migration, no code splitting, no infrastructure changes.
+created_at: "2026-03-21"
+created_by: gem-planner
+status: pending_approval
+research_confidence: high
+
+tldr: |
+  8-task plan across 4 waves to harden a monolithic Next.js 16 portfolio app.
+  Wave 1 fixes foundational metadata, dead CSS, and config issues (3 parallel tasks).
+  Wave 2 patches page.tsx bugs, adds accessibility, and secures ErrorBoundary (3 parallel tasks).
+  Wave 3 modernizes GSAP usage with the useGSAP hook for cleaner lifecycle management.
+  Wave 4 validates all changes via browser testing.
+  All work stays within the existing "use client" architecture — no SSR migration.
+
+open_questions:
+  - Should an actual og:image be created/designed, or just wire up a placeholder path for now?
+  - Is the film grain overlay (body::before z-index:9999) desired UX, or should it be removed entirely vs just lowered?
+  - Are the three @react-three/* packages planned for future use, or safe to remove permanently?
+
+pre_mortem:
+  overall_risk_level: medium
+  critical_failure_modes:
+    - scenario: GSAP useEffect-to-useGSAP migration breaks ScrollTrigger animations
+      likelihood: medium
+      impact: high
+      mitigation: |
+        Task 7 is isolated in Wave 3. If animations break, revert useGSAP changes
+        and keep raw useEffect. Browser testing in Wave 4 will catch regressions.
+    - scenario: CSS cleanup removes styles still referenced by GSAP or JS classes
+      likelihood: low
+      impact: medium
+      mitigation: |
+        grep all class names being removed against page.tsx and globals.css before deletion.
+        Task 2 agent must verify no JS code adds these classes dynamically.
+    - scenario: Removing unused deps breaks pnpm lockfile or causes type errors
+      likelihood: low
+      impact: low
+      mitigation: |
+        Run pnpm install and pnpm build after removing deps to validate.
+        Also remove @types/three from devDependencies.
+    - scenario: Changing film grain z-index causes visual layering issues with mobile menu or loading screen
+      likelihood: medium
+      impact: medium
+      mitigation: |
+        Audit all z-index values in globals.css and components before changing.
+        Mobile menu and loading screen z-indexes must remain above film grain.
+  assumptions:
+    - The app builds successfully with pnpm build before any changes
+    - hero-bg.webp is a valid replacement for hero-bg.png (same dimensions, correct content)
+    - The @gsap/react package's useGSAP hook is compatible with GSAP 3.14+ and React 19
+    - No other consumers of @react-three/* exist outside the scanned codebase
+
+implementation_specification:
+  code_structure: |
+    All changes are in-place edits to existing files. No new components or modules are created.
+    The monolithic page.tsx architecture is preserved — fixes are surgical patches, not refactors.
+  affected_areas:
+    - app/layout.tsx (metadata + viewport export)
+    - app/globals.css (dead code removal, z-index fix, delay class removal, @theme cleanup)
+    - next.config.ts (remote image patterns)
+    - package.json (unused dependency removal)
+    - app/page.tsx (bug fixes, image path, memoization, cursor fix, will-change cleanup)
+    - app/components/ErrorBoundary.tsx (production error message sanitization)
+  component_details:
+    - component: layout.tsx metadata
+      responsibility: Provide complete SEO metadata including viewport, og:image, twitter large card, themeColor
+      interfaces:
+        - "export const metadata: Metadata"
+        - "export const viewport: Viewport"
+    - component: globals.css
+      responsibility: Provide global styles without dead code, correct z-index layering, no Tailwind conflicts
+      interfaces:
+        - "body::before film grain at z-index:50 (below modals/menus)"
+    - component: next.config.ts
+      responsibility: Configure Next.js image optimization with GitHub avatar remote patterns
+      interfaces:
+        - "images.remotePatterns for avatars.githubusercontent.com"
+    - component: page.tsx patches
+      responsibility: Fix runtime bugs (duplicate keys, cursor position, image format, memoization)
+      interfaces:
+        - "Unique React keys for fallbackRepos"
+        - "Cursor initialized off-screen until first mousemove"
+    - component: ErrorBoundary.tsx
+      responsibility: Catch errors without leaking implementation details in production
+      interfaces:
+        - "Generic error message in production, detailed in development"
+    - component: Accessibility layer
+      responsibility: Add skip-nav, focus-visible, aria-labels for screen reader compliance
+      interfaces:
+        - "Skip-to-content link in layout.tsx"
+        - "Focus-visible utility in globals.css"
+  dependencies:
+    - component: Wave 2 tasks
+      relationship: Depend on Wave 1 completing CSS and config cleanup to avoid merge conflicts
+    - component: Task 7 (useGSAP)
+      relationship: Depends on Task 4 page.tsx bug fixes being applied first
+    - component: Task 8 (browser testing)
+      relationship: Validates all previous waves — depends on all implementation tasks
+  integration_points:
+    - layout.tsx viewport export integrates with Next.js metadata API
+    - next.config.ts remotePatterns integrates with next/image component in page.tsx
+    - Skip-nav link in layout.tsx targets #main-content anchor in page.tsx
+    - ErrorBoundary production check uses process.env.NODE_ENV
+
+contracts:
+  - from_task: task-1
+    to_task: task-5
+    interface: layout.tsx has a skip-nav link target structure that task-5 wires up
+    format: "Skip-nav link in layout.tsx body, #main-content id on main element in page.tsx"
+  - from_task: task-2
+    to_task: task-4
+    interface: globals.css dead code is removed so page.tsx fixes don't reference stale classes
+    format: "No .reveal/.delay-* classes remain in globals.css after task-2"
+  - from_task: task-4
+    to_task: task-7
+    interface: page.tsx bug fixes are in place before useGSAP migration modifies the same useEffect blocks
+    format: "page.tsx with clean fallbackRepos keys, hero-bg.webp, cursor fix applied"
+
+tasks:
+  - id: task-1
+    title: Fix layout.tsx metadata and viewport export
+    description: |
+      Add missing viewport export with themeColor to layout.tsx.
+      Add og:image to openGraph metadata (use /images/og-image.png placeholder path).
+      Change twitter card from "summary" to "summary_large_image".
+      These are all changes to the existing metadata object and a new viewport export.
+    wave: 1
+    agent: gem-implementer
+    priority: high
+    status: pending
+    dependencies: []
+    context_files:
+      - app/layout.tsx: "Root layout with metadata export — lines 31-56 contain current metadata"
+      - docs/plan/audit-enhance-2026-03-21/research_findings_app_audit.yaml: "Audit findings for layout issues"
+    estimated_effort: small
+    estimated_files: 1
+    estimated_lines: 20
+    focus_area: app/layout.tsx
+    tech_stack:
+      - Next.js 16 Metadata API
+      - Next.js Viewport export
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "Viewport export exists with themeColor set"
+      - "openGraph.images array is present in metadata"
+      - "twitter.card is 'summary_large_image'"
+    acceptance_criteria:
+      - layout.tsx exports a `viewport` object with `themeColor` property
+      - openGraph metadata includes an `images` array with at least one entry
+      - Twitter card type is changed to "summary_large_image"
+      - No TypeScript errors introduced
+    failure_modes:
+      - scenario: viewport export type doesn't match Next.js 16 API
+        likelihood: low
+        impact: medium
+        mitigation: Check Next.js 16 docs for correct Viewport type import and shape
+    requires_review: false
+    review_depth: null
+    security_sensitive: false
+
+  - id: task-2
+    title: Clean up dead CSS and fix styling issues in globals.css
+    description: |
+      1. Remove dead reveal animation classes (.reveal, .reveal-left, .reveal-right, .reveal-scale
+         and their .visible variants) — GSAP controls these animations entirely via inline styles.
+         Also remove the prefers-reduced-motion media query block that references these classes.
+      2. Remove conflicting delay utility classes (.delay-1 through .delay-6) that clash with
+         Tailwind's built-in delay utilities.
+      3. Lower body::before film grain z-index from 9999 to 50 so it doesn't cover modals,
+         mobile menu, or interfere with screen readers. Verify mobile-menu and loading screen
+         z-indexes remain higher.
+      4. Clean up @theme inline block — ensure font variable definitions are clear and
+         non-circular (they should reference the next/font CSS variables like --font-playfair etc).
+
+      IMPORTANT: Before removing any class, grep page.tsx to confirm it's not dynamically added by JS.
+      The GSAP code in page.tsx adds "visible" class to elements but controls transforms via
+      gsap.to() — the CSS transitions are never used.
+    wave: 1
+    agent: gem-implementer
+    priority: high
+    status: pending
+    dependencies: []
+    context_files:
+      - app/globals.css: "Lines 3-7 (@theme), 51-63 (film grain), 86-142 (reveal + delay classes), ~454 (reduced-motion reveal block)"
+      - app/page.tsx: "GSAP animations at lines 241-620 — verify class usage patterns"
+    estimated_effort: medium
+    estimated_files: 1
+    estimated_lines: 80
+    focus_area: app/globals.css
+    tech_stack:
+      - Tailwind CSS v4
+      - CSS custom properties
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "No .reveal or .delay-N classes remain in globals.css"
+      - "body::before z-index is 50, not 9999"
+      - "grep confirms no page.tsx code references removed CSS class names for transitions"
+    acceptance_criteria:
+      - All .reveal*, .delay-* CSS rules are removed from globals.css
+      - body::before z-index changed from 9999 to 50
+      - @theme block has clear, non-circular font variable definitions
+      - Mobile menu and loading screen z-indexes verified higher than 50
+      - Build succeeds and no visual regression in film grain effect
+    failure_modes:
+      - scenario: Removing reveal classes breaks GSAP "visible" class toggle
+        likelihood: low
+        impact: medium
+        mitigation: |
+          GSAP adds "visible" class but drives transforms via gsap.to() — CSS transitions
+          are redundant. Verify by checking if page.tsx classList.add("visible") is
+          paired with CSS transition reliance. If so, keep only the class name, remove transition.
+      - scenario: Film grain z-index change causes it to render behind content
+        likelihood: low
+        impact: low
+        mitigation: "z-index:50 is above normal content (z-0 to z-10) but below modals (z-[9999])"
+
+  - id: task-3
+    title: Fix next.config.ts and remove unused dependencies
+    description: |
+      1. Add remotePatterns to next.config.ts images config for GitHub avatar URLs:
+         - protocol: "https", hostname: "avatars.githubusercontent.com"
+         - protocol: "https", hostname: "raw.githubusercontent.com"
+         This allows next/image to optimize GitHub-fetched images.
+
+      2. Remove unused dependencies from package.json:
+         - @react-three/fiber
+         - @react-three/drei
+         - three
+         - @types/three (devDependencies)
+         These are not imported anywhere in the codebase.
+
+      3. Run pnpm install to update lockfile after dependency removal.
+    wave: 1
+    agent: gem-implementer
+    priority: high
+    status: pending
+    dependencies: []
+    context_files:
+      - next.config.ts: "Current config — only has images.formats, needs remotePatterns"
+      - package.json: "Lines 13-15 have unused @react-three/* and three deps, line 28 has @types/three"
+    estimated_effort: small
+    estimated_files: 2
+    estimated_lines: 30
+    focus_area: null
+    tech_stack:
+      - Next.js 16 config
+      - pnpm
+    test_coverage: null
+    verification:
+      - "pnpm install completes without errors"
+      - "pnpm build completes without errors"
+      - "grep confirms no @react-three or three imports in app/"
+      - "next.config.ts includes remotePatterns for avatars.githubusercontent.com"
+    acceptance_criteria:
+      - next.config.ts has remotePatterns allowing GitHub avatar domains
+      - @react-three/fiber, @react-three/drei, three removed from dependencies
+      - @types/three removed from devDependencies
+      - pnpm lockfile updated and build passes
+    failure_modes:
+      - scenario: Removing deps breaks build due to hidden transitive dependency
+        likelihood: low
+        impact: medium
+        mitigation: Run full pnpm build after removal — if it fails, check for indirect imports
+
+  - id: task-4
+    title: Fix page.tsx bugs (keys, cursor, image, memoization)
+    description: |
+      Fix multiple runtime bugs in app/page.tsx:
+
+      1. DUPLICATE REACT KEYS: fallbackRepos array (line ~42-47) uses repo.html_url as key
+         but all entries share "https://github.com/Raghdkun". Fix by giving each fallback repo
+         a unique html_url (e.g., append /<repo-name>) or use the repo name as the key
+         in the map() call at line ~1141.
+
+      2. HERO IMAGE FORMAT: Change src="/images/hero-bg.png" to src="/images/hero-bg.webp"
+         at line ~801 to use the optimized WebP version that already exists in public/images/.
+
+      3. CURSOR INITIAL POSITION: The custom cursor div renders at (0,0) on page load,
+         causing potential overflow. Initialize cursor position off-screen (e.g., transform:
+         translate(-100px, -100px)) or set opacity:0 until first mousemove event.
+
+      4. MARQUEE ARRAY: marqueeItems array (line ~79) is defined at module scope — fine.
+         But verify it's not being recreated inside the component. If it's inside, move it outside.
+
+      5. WILL-CHANGE CLEANUP: Elements with will-change-transform class (hero bg, hero content,
+         hero letters, interlude bg) never remove the property. Add will-change: auto after
+         animations complete in the GSAP onComplete callbacks, or accept the current state
+         if animations persist during scroll.
+
+      SCOPE: Only fix the specific bugs listed above. Do NOT refactor the component structure.
+    wave: 2
+    agent: gem-implementer
+    priority: high
+    status: pending
+    dependencies:
+      - task-2
+    context_files:
+      - app/page.tsx: "Lines 42-47 (fallbackRepos), ~79 (marqueeItems), ~89 (cursorRef), ~129-178 (cursor logic), ~797-801 (hero bg image), ~1141 (repo map key), ~1233 (interlude bg)"
+      - public/images/: "hero-bg.webp exists alongside hero-bg.png"
+    estimated_effort: medium
+    estimated_files: 1
+    estimated_lines: 40
+    focus_area: app/page.tsx
+    tech_stack:
+      - React 19
+      - Next.js Image component
+      - GSAP
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "No duplicate React key warnings in browser console"
+      - "Hero section loads hero-bg.webp"
+      - "Custom cursor is not visible at (0,0) on page load"
+    acceptance_criteria:
+      - Each fallbackRepo has a unique key (either unique html_url or use name as key)
+      - Hero image src is /images/hero-bg.webp
+      - Cursor is hidden/offscreen until first mousemove
+      - marqueeItems array is at module scope, not recreated per render
+      - No new TypeScript errors
+    failure_modes:
+      - scenario: Changing React keys causes GSAP animation references to break
+        likelihood: low
+        impact: medium
+        mitigation: Keys only affect React reconciliation, not GSAP refs. GSAP targets DOM via useRef.
+      - scenario: hero-bg.webp has different dimensions causing layout shift
+        likelihood: low
+        impact: low
+        mitigation: Verify both images have same dimensions before switching
+
+  - id: task-5
+    title: Add accessibility improvements
+    description: |
+      Add essential accessibility features across the app:
+
+      1. SKIP-NAV LINK: Add a visually-hidden skip-to-content link as the first focusable
+         element in layout.tsx <body>. Style it to appear on focus. Target #main-content.
+         Add id="main-content" to the <main> element in page.tsx (or the outermost content wrapper).
+
+      2. FOCUS-VISIBLE STYLES: Add a global focus-visible utility in globals.css that provides
+         visible focus indicators (outline) for keyboard users while not affecting mouse users.
+         Use :focus-visible pseudo-class.
+
+      3. SVG ARIA LABELS: Add aria-hidden="true" to decorative SVGs in page.tsx (icons in
+         skill cards, social links, etc.). For meaningful SVGs (like social media links),
+         add aria-label to the parent <a> tag instead.
+
+      4. CONTACT LINK ARIA: Add aria-label attributes to contact section links (email, phone,
+         social media) that currently only have icon content.
+
+      5. NAV ARIA: Add aria-label="Main navigation" to the <nav> element. Ensure mobile menu
+         toggle has aria-expanded and aria-controls attributes.
+
+      SCOPE: Add a11y attributes and skip-nav. Do NOT restructure components.
+    wave: 2
+    agent: gem-implementer
+    priority: high
+    status: pending
+    dependencies:
+      - task-1
+    context_files:
+      - app/layout.tsx: "Add skip-nav link inside <body> before ErrorBoundary"
+      - app/page.tsx: "Add #main-content id, aria-labels on nav/SVGs/contact links, aria-expanded on mobile menu"
+      - app/globals.css: "Add focus-visible and skip-nav styles"
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 60
+    focus_area: null
+    tech_stack:
+      - WAI-ARIA
+      - CSS :focus-visible
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "Tab key reveals skip-nav link"
+      - "Focus-visible outline appears on keyboard navigation"
+      - "Screen reader announces nav, contact links, and skip-nav correctly"
+    acceptance_criteria:
+      - Skip-to-content link exists and is first focusable element
+      - Focus-visible styles provide clear outline on keyboard focus
+      - Decorative SVGs have aria-hidden="true"
+      - Contact links have descriptive aria-labels
+      - Nav element has aria-label, mobile toggle has aria-expanded
+    failure_modes:
+      - scenario: Skip-nav link z-index conflicts with film grain or other overlays
+        likelihood: low
+        impact: low
+        mitigation: Style skip-nav with z-index higher than film grain (z-[60]) when focused
+
+  - id: task-6
+    title: Secure ErrorBoundary error display for production
+    description: |
+      Modify ErrorBoundary.tsx to not expose raw error.message in production.
+
+      Current code at line ~115 shows:
+        {this.state.error?.message || "Unknown error"}
+
+      Change to:
+        - In development (process.env.NODE_ENV === "development"): show full error.message
+        - In production: show a generic message like "An unexpected error occurred."
+
+      This prevents leaking internal implementation details, stack traces, or
+      sensitive data through error messages in production builds.
+    wave: 2
+    agent: gem-implementer
+    priority: medium
+    status: pending
+    dependencies: []
+    context_files:
+      - app/components/ErrorBoundary.tsx: "Line ~115 displays raw error.message — needs production guard"
+    estimated_effort: small
+    estimated_files: 1
+    estimated_lines: 10
+    focus_area: app/components/ErrorBoundary.tsx
+    tech_stack:
+      - React class components
+      - process.env.NODE_ENV
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "In production build, error message shows generic text"
+      - "In dev mode, error message still shows full details"
+    acceptance_criteria:
+      - Production builds show generic "An unexpected error occurred" message
+      - Development builds show full error.message
+      - Error boundary still catches and recovers from errors correctly
+    failure_modes:
+      - scenario: process.env.NODE_ENV check doesn't work in client component
+        likelihood: low
+        impact: low
+        mitigation: |
+          Next.js inlines NODE_ENV at build time for client components.
+          This is a well-established pattern.
+
+  - id: task-7
+    title: Migrate GSAP animations to useGSAP hook
+    description: |
+      Replace raw useEffect + gsap.context() pattern with the useGSAP hook from @gsap/react.
+      The package is already installed but the hook is never used.
+
+      The main animation useEffect in page.tsx (lines ~241-620) creates a gsap.context()
+      and returns context.revert() in cleanup. The useGSAP hook handles this automatically
+      with better cleanup semantics.
+
+      Steps:
+      1. Import { useGSAP } from "@gsap/react" at top of page.tsx
+      2. Replace the main GSAP useEffect (lines ~241-620) with useGSAP(() => { ... }, { scope: containerRef })
+         where containerRef is a ref on the outermost wrapper element.
+      3. The useGSAP hook auto-reverts all GSAP animations on unmount — remove manual
+         context.revert() cleanup.
+      4. Keep the dependency array behavior equivalent (should run once on mount).
+
+      IMPORTANT: This is a 1:1 migration — do NOT change any animation logic, timing,
+      or ScrollTrigger configuration. Only change the hook wrapper.
+
+      If the migration is complex or risky due to multiple useEffects with GSAP,
+      limit scope to the single largest useEffect only.
+    wave: 3
+    agent: gem-implementer
+    priority: medium
+    status: pending
+    dependencies:
+      - task-4
+    context_files:
+      - app/page.tsx: "Lines ~241-620 (main GSAP useEffect), line 1 (imports)"
+      - node_modules/@gsap/react/: "useGSAP hook API reference"
+    estimated_effort: medium
+    estimated_files: 1
+    estimated_lines: 30
+    focus_area: app/page.tsx
+    tech_stack:
+      - "@gsap/react useGSAP hook"
+      - GSAP 3.14+
+      - React 19
+    test_coverage: null
+    verification:
+      - "pnpm build completes without errors"
+      - "All scroll-triggered animations still fire correctly"
+      - "No GSAP warnings or errors in browser console"
+      - "Animations clean up properly on page navigation"
+    acceptance_criteria:
+      - Main GSAP useEffect replaced with useGSAP hook
+      - Manual gsap.context() and context.revert() removed
+      - All animations behave identically to before
+      - No console errors or warnings
+    failure_modes:
+      - scenario: useGSAP scope doesn't capture all ScrollTrigger targets
+        likelihood: medium
+        impact: high
+        mitigation: |
+          If any animations break, verify the scope ref wraps all animated elements.
+          Fallback: revert to useEffect pattern completely — this is a polish task, not critical.
+    requires_review: true
+    review_depth: standard
+    security_sensitive: false
+
+  - id: task-8
+    title: Browser validation of all changes
+    description: |
+      Comprehensive browser testing to validate all changes from Waves 1-3.
+
+      Test the following scenarios:
+      1. PAGE LOAD: Loading screen appears, page renders without console errors
+      2. METADATA: Verify page source has correct viewport meta, og:image, twitter card
+      3. SCROLL ANIMATIONS: All GSAP scroll-triggered animations fire correctly
+         (hero parallax, section reveals, skill cards, project cards, interlude)
+      4. MOBILE MENU: Hamburger toggle opens/closes menu, links navigate correctly
+      5. CUSTOM CURSOR: Not visible at (0,0) on load, follows mouse after first move
+      6. PROJECTS SECTION: No duplicate key warnings in console (check fallbackRepos)
+      7. HERO IMAGE: Verify hero background uses .webp format
+      8. ACCESSIBILITY: Tab through page — skip-nav visible on focus, focus outlines present
+      9. FILM GRAIN: Overlay visible but doesn't block interactions or mobile menu
+      10. ERROR BOUNDARY: Artificially trigger error to verify generic message in prod build
+      11. RESPONSIVE: Test at mobile (375px), tablet (768px), desktop (1440px) viewports
+    wave: 4
+    agent: gem-browser-tester
+    priority: high
+    status: pending
+    dependencies:
+      - task-4
+      - task-5
+      - task-6
+      - task-7
+    context_files:
+      - app/page.tsx: "Full page component — all sections to validate"
+      - app/layout.tsx: "Metadata and skip-nav to validate"
+      - app/globals.css: "CSS changes to validate visually"
+      - app/components/ErrorBoundary.tsx: "Error display to validate"
+    estimated_effort: medium
+    estimated_files: 0
+    estimated_lines: 0
+    focus_area: null
+    validation_matrix:
+      - scenario: Page loads without console errors
+        steps:
+          - Open http://localhost:3000 in browser
+          - Wait for loading screen to complete
+          - Open browser console and check for errors
+        expected_result: No React warnings, no duplicate key errors, no GSAP errors
+      - scenario: Metadata is correct in page source
+        steps:
+          - View page source
+          - Search for viewport, og:image, twitter:card meta tags
+        expected_result: |
+          viewport meta has themeColor, og:image present,
+          twitter:card is "summary_large_image"
+      - scenario: Scroll animations work correctly
+        steps:
+          - Scroll through entire page slowly
+          - Observe hero parallax, section reveals, skill cards, project cards
+        expected_result: All animations trigger on scroll, no jank or broken transforms
+      - scenario: Skip-nav and keyboard navigation
+        steps:
+          - Press Tab from top of page
+          - Verify skip-nav link appears
+          - Press Enter on skip-nav
+          - Continue tabbing through interactive elements
+        expected_result: Skip-nav visible on focus, jumps to main content, focus outlines visible
+      - scenario: Custom cursor behavior
+        steps:
+          - Load page fresh
+          - Check if cursor dot is visible at top-left corner
+          - Move mouse to trigger cursor
+        expected_result: Cursor hidden until first mousemove, then follows mouse smoothly
+      - scenario: Mobile responsive
+        steps:
+          - Resize to 375px width
+          - Open mobile menu
+          - Navigate sections
+          - Verify film grain doesn't block interactions
+        expected_result: Menu opens/closes, links work, no z-index blocking
+      - scenario: Error boundary production message
+        steps:
+          - Build with pnpm build, start with pnpm start
+          - Trigger error (temporarily throw in a component)
+          - Check error message displayed
+        expected_result: Generic error message shown, not raw error.message
+    requires_review: false
+    review_depth: null
+    security_sensitive: false
+    environment: development
+    requires_approval: false

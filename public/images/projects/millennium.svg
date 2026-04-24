@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="mbg" cx="0.5" cy="0.4" r="0.9">
+      <stop offset="0" stop-color="#1a1430"/>
+      <stop offset="1" stop-color="#06030f"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe48a"/>
+      <stop offset="0.5" stop-color="#d4a02a"/>
+      <stop offset="1" stop-color="#7a5a0c"/>
+    </linearGradient>
+    <linearGradient id="cardA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b2e6d"/>
+      <stop offset="1" stop-color="#1a1230"/>
+    </linearGradient>
+    <linearGradient id="cardB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a2c2c"/>
+      <stop offset="1" stop-color="#2a0e0e"/>
+    </linearGradient>
+    <linearGradient id="cardC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f4a3a"/>
+      <stop offset="1" stop-color="#0c1d18"/>
+    </linearGradient>
+    <filter id="gglow"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <rect width="1440" height="900" fill="url(#mbg)"/>
+
+  <!-- starfield -->
+  <g fill="#d4a02a" opacity="0.5">
+    <circle cx="120" cy="180" r="1.5"/>
+    <circle cx="320" cy="80" r="1"/>
+    <circle cx="1200" cy="120" r="2"/>
+    <circle cx="1320" cy="260" r="1.2"/>
+    <circle cx="80" cy="700" r="1.5"/>
+    <circle cx="1380" cy="640" r="1"/>
+    <circle cx="220" cy="500" r="1"/>
+    <circle cx="1100" cy="540" r="1.5"/>
+  </g>
+
+  <!-- 3 cards fanned -->
+  <g transform="translate(720 460)">
+    <g transform="rotate(-14) translate(-260 -40)">
+      <rect x="0" y="0" width="280" height="400" rx="14" fill="url(#cardC)" stroke="url(#gold)" stroke-width="4"/>
+      <rect x="14" y="14" width="252" height="200" rx="8" fill="#0a1e18"/>
+      <rect x="14" y="226" width="252" height="160" rx="8" fill="#0a1e18" opacity="0.6"/>
+    </g>
+    <g transform="rotate(14) translate(-20 -40)">
+      <rect x="0" y="0" width="280" height="400" rx="14" fill="url(#cardB)" stroke="url(#gold)" stroke-width="4"/>
+      <rect x="14" y="14" width="252" height="200" rx="8" fill="#1e0808"/>
+      <rect x="14" y="226" width="252" height="160" rx="8" fill="#1e0808" opacity="0.6"/>
+    </g>
+    <g transform="translate(-140 -80)">
+      <rect x="0" y="0" width="280" height="400" rx="14" fill="url(#cardA)" stroke="url(#gold)" stroke-width="5" filter="url(#gglow)"/>
+      <rect x="14" y="14" width="252" height="220" rx="8" fill="#120822"/>
+      <rect x="14" y="246" width="252" height="140" rx="8" fill="#120822" opacity="0.65"/>
+      <!-- eye of horus motif -->
+      <g transform="translate(140 130)" stroke="url(#gold)" stroke-width="4" fill="none" stroke-linecap="round">
+        <ellipse cx="0" cy="0" rx="60" ry="28"/>
+        <circle cx="0" cy="0" r="14" fill="url(#gold)"/>
+        <path d="M -60 0 Q -90 18 -78 36"/>
+        <path d="M 0 28 L 0 60"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- title -->
+  <text x="720" y="180" text-anchor="middle" font-family="'Space Grotesk', system-ui, sans-serif"
+        font-size="84" font-weight="700" fill="url(#gold)" letter-spacing="2">MILLENNIUM</text>
+  <text x="720" y="240" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+        font-size="22" fill="#d4a02a" letter-spacing="6">TOOLKIT · YU-GI-OH! COMPANION</text>
+
+  <!-- corner badge -->
+  <g transform="translate(60 60)" font-family="'JetBrains Mono', monospace" fill="#ffe48a">
+    <text x="0" y="0" font-size="16" letter-spacing="2">// MOBILE APP</text>
+    <text x="0" y="22" font-size="14" fill="#9a8a55" letter-spacing="2">FLUTTER · DART · LARAVEL</text>
+  </g>
+</svg>

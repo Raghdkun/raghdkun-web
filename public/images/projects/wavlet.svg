@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="wbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1027"/>
+      <stop offset="1" stop-color="#0f1b3d"/>
+    </linearGradient>
+    <linearGradient id="wave1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5b6cff"/>
+      <stop offset="1" stop-color="#1be7ff"/>
+    </linearGradient>
+    <linearGradient id="wave2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3fd8" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#0fbfd1" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1440" height="900" fill="url(#wbg)"/>
+  <!-- subtle grid -->
+  <g stroke="#1e2a55" stroke-width="1" opacity="0.35">
+    <path d="M0 200 H1440 M0 400 H1440 M0 600 H1440"/>
+    <path d="M240 0 V900 M480 0 V900 M720 0 V900 M960 0 V900 M1200 0 V900"/>
+  </g>
+  <!-- big W logo -->
+  <g transform="translate(720 380)" filter="url(#glow)">
+    <path d="M-180 -110 L-90 110 L0 -60 L90 110 L180 -110"
+          fill="none" stroke="url(#wave1)" stroke-width="22"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- title -->
+  <text x="720" y="600" text-anchor="middle" font-family="'Space Grotesk', system-ui, sans-serif"
+        font-size="96" font-weight="700" fill="#ffffff" letter-spacing="-1">Wavlet</text>
+  <text x="720" y="660" text-anchor="middle" font-family="'JetBrains Mono', monospace"
+        font-size="26" fill="#9aa6c7" letter-spacing="2">FEEL YOUR FINANCES FLOW</text>
+  <!-- waves bottom -->
+  <path d="M0 760 C 240 700 480 820 720 760 S 1200 700 1440 760 L 1440 900 L 0 900 Z"
+        fill="url(#wave2)" opacity="0.85"/>
+  <path d="M0 810 C 200 760 460 870 720 810 S 1240 760 1440 810 L 1440 900 L 0 900 Z"
+        fill="url(#wave1)" opacity="0.65"/>
+  <!-- corner badge -->
+  <g transform="translate(60 60)" font-family="'JetBrains Mono', monospace" fill="#1be7ff">
+    <text x="0" y="0" font-size="16" letter-spacing="2">// MOBILE APP</text>
+    <text x="0" y="22" font-size="14" fill="#9aa6c7" letter-spacing="2">FLUTTER · DART</text>
+  </g>
+</svg>

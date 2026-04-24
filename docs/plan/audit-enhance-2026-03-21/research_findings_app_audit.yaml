@@ -1,0 +1,503 @@
+plan_id: audit-enhance-2026-03-21
+objective: Comprehensive audit of the Next.js app's layout, page structure, components, styling, and potential issues.
+focus_area: Layout structure, component architecture, CSS/styling, accessibility, performance patterns
+created_at: "2026-03-21"
+created_by: researcher
+status: completed
+
+tldr: |
+  - Monolithic ~1400-line page.tsx handles all sections (hero, about, skills, projects, interlude, contact, footer) in a single "use client" component with heavy GSAP animation logic
+  - Chrome audit report reveals duplicate React key errors across all viewports, overflow nodes from cursor/marquee elements, and an LCP warning on interlude-bg.webp
+  - Three unused dependencies in package.json: @react-three/fiber, @react-three/drei, three — none are imported anywhere in the app
+  - Accessibility is minimal: no skip-nav link, no focus-visible styling, SVG icons lack accessible labels, nav links use anchor href fragments without proper a11y roles
+  - Film grain overlay on body::before at z-index:9999 covers the entire page — may interfere with browser accessibility tools and screen readers
+
+research_metadata:
+  methodology: "Hybrid retrieval: semantic_search + grep_search for pattern discovery, read_file for detailed examination across all app files, chrome audit report analysis"
+  scope: "Full app directory (layout.tsx, page.tsx, globals.css, all 3 components, all config files), public assets inventory, existing chrome audit report, static website.html reference"
+  confidence: high
+  coverage: 100
+
+files_analyzed:
+  - file: layout.tsx
+    path: app/layout.tsx
+    purpose: Root layout — loads 3 Google Fonts, wraps children in ErrorBoundary > SmoothScroller
+    key_elements:
+      - element: metadata
+        type: variable
+        location: app/layout.tsx:32
+        description: "Exports Metadata with OG/Twitter/robots; metadataBase set to https://raghdkun.dev"
+      - element: RootLayout
+        type: function
+        location: app/layout.tsx:58
+        description: "Renders <html lang='en'> with font CSS variables on <body>, wraps children in ErrorBoundary then SmoothScroller"
+      - element: Font loading
+        type: pattern
+        location: app/layout.tsx:7-29
+        description: "Playfair Display (400,700,900 + italic), Space Mono (400,700 + italic), Bebas Neue (400 only) — all with display:swap"
+    language: TypeScript (TSX)
+    lines: 71
+
+  - file: page.tsx
+    path: app/page.tsx
+    purpose: "Monolithic home page — 'use client' component containing ALL sections, GSAP animations, GitHub API fetch, custom cursor, marquee, mobile menu"
+    key_elements:
+      - element: Home
+        type: function
+        location: app/page.tsx:107
+        description: "Main page component with 14+ useRef hooks, 4 useState hooks, 7+ useEffect hooks"
+      - element: GitHub fetch
+        type: pattern
+        location: app/page.tsx:122-138
+        description: "Fetches repos from GitHub API with AbortController; falls back to hardcoded fallbackRepos array on error"
+      - element: GSAP animations
+        type: pattern
+        location: app/page.tsx:241-620
+        description: "Massive useEffect with gsap.context wrapping ~380 lines of ScrollTrigger animations, magnetic buttons, 3D tilt, parallax"
+      - element: displayRepos key issue
+        type: pattern
+        location: app/page.tsx:1141
+        description: "Uses repo.html_url as React key — multiple fallback repos share same URL 'https://github.com/Raghdkun' causing duplicate key errors"
+      - element: marquee items
+        type: pattern
+        location: app/page.tsx:892
+        description: "Marquee uses array index as key: key={i} — anti-pattern but acceptable for static list"
+      - element: Sections
+        type: pattern
+        location: app/page.tsx:700-1420
+        description: "nav, hero, marquee, about, skills, projects, interlude, contact, footer — all inline in one component"
+    language: TypeScript (TSX)
+    lines: 1420
+
+  - file: globals.css
+    path: app/globals.css
+    purpose: "Global styles including Tailwind v4 import, Lenis reset, custom cursor, reveal animations, glitch effects, scratch lines, vignette, mobile menu, button styles, film dividers"
+    key_elements:
+      - element: "@import tailwindcss"
+        type: pattern
+        location: app/globals.css:1
+        description: "Tailwind v4 single import pattern"
+      - element: "@theme inline"
+        type: pattern
+        location: app/globals.css:3-7
+        description: "Registers 3 font CSS custom properties for Tailwind v4 theme"
+      - element: "body::before film grain"
+        type: pattern
+        location: app/globals.css:52-63
+        description: "Fixed full-screen SVG noise overlay at z-index:9999 with opacity 0.25 — covers entire page"
+      - element: cursor styles
+        type: pattern
+        location: app/globals.css:66-83
+        description: "Custom cursor and follower with mix-blend-mode:difference, hidden on touch devices"
+      - element: reveal animations
+        type: pattern
+        location: app/globals.css:86-132
+        description: "CSS-based reveal classes (.reveal, .reveal-left, .reveal-right, .reveal-scale) — ALSO driven by GSAP in page.tsx creating potential double-animation"
+      - element: mobile-menu
+        type: pattern
+        location: app/globals.css:380-414
+        description: "Fixed overlay with clip-path transition, proper safe-area-inset handling"
+    language: CSS
+    lines: ~440
+
+  - file: ErrorBoundary.tsx
+    path: app/components/ErrorBoundary.tsx
+    purpose: "React class component error boundary with cinematic 'CUT!' error UI, retry and reload buttons"
+    key_elements:
+      - element: ErrorBoundary
+        type: class
+        location: app/components/ErrorBoundary.tsx:14
+        description: "Class component with getDerivedStateFromError, handleRetry resets state, handleReload does window.location.reload()"
+      - element: "use client"
+        type: pattern
+        location: app/components/ErrorBoundary.tsx:1
+        description: "Marked as client component — required for class component error boundary"
+      - element: Error display
+        type: pattern
+        location: app/components/ErrorBoundary.tsx:37-149
+        description: "Displays error.message directly in UI — potential information leak in production"
+    language: TypeScript (TSX)
+    lines: 149
+
+  - file: LoadingScreen.tsx
+    path: app/components/LoadingScreen.tsx
+    purpose: "Cinematic loading screen with GSAP-driven progress bar, glitch effects, skip button"
+    key_elements:
+      - element: LoadingScreen
+        type: function
+        location: app/components/LoadingScreen.tsx:11
+        description: "Client component with simulated progress (not tied to real asset loading), GSAP timeline for exit animation"
+      - element: prefers-reduced-motion
+        type: pattern
+        location: app/components/LoadingScreen.tsx:96
+        description: "Respects reduced motion — calls onComplete() immediately if user prefers reduced motion"
+      - element: Progress simulation
+        type: pattern
+        location: app/components/LoadingScreen.tsx:130-210
+        description: "Fake progress with rAF, speeds up when document.readyState is 'complete', max duration 2.2-3.2s"
+      - element: Skip button
+        type: pattern
+        location: app/components/LoadingScreen.tsx:390-410
+        description: "Allows skipping the loading animation — good UX"
+    language: TypeScript (TSX)
+    lines: ~415
+
+  - file: SmoothScroller.tsx
+    path: app/components/SmoothScroller.tsx
+    purpose: "Lenis smooth scroll wrapper integrated with GSAP ScrollTrigger"
+    key_elements:
+      - element: SmoothScroller
+        type: function
+        location: app/components/SmoothScroller.tsx:10
+        description: "Initializes Lenis on mount (desktop only), integrates with GSAP ticker, properly cleans up on unmount"
+      - element: Accessibility guard
+        type: pattern
+        location: app/components/SmoothScroller.tsx:16-20
+        description: "Skips smooth scrolling if prefers-reduced-motion or touch device detected"
+      - element: Lenis config
+        type: pattern
+        location: app/components/SmoothScroller.tsx:22-29
+        description: "duration:1.2, custom easing, vertical orientation, touchMultiplier:2"
+    language: TypeScript (TSX)
+    lines: 56
+
+  - file: next.config.ts
+    path: next.config.ts
+    purpose: "Minimal Next.js config — only sets image formats to avif+webp"
+    key_elements:
+      - element: images.formats
+        type: variable
+        location: next.config.ts:4-6
+        description: "Enables AVIF and WebP image optimization"
+    language: TypeScript
+    lines: 9
+
+  - file: tsconfig.json
+    path: tsconfig.json
+    purpose: "TypeScript config with bundler moduleResolution, strict mode, path alias @/*"
+    key_elements:
+      - element: jsx
+        type: variable
+        location: tsconfig.json:14
+        description: "Set to 'react-jsx' — correct for Next.js"
+      - element: target
+        type: variable
+        location: tsconfig.json:3
+        description: "ES2017 — conservative but fine"
+    language: JSON
+    lines: 31
+
+  - file: package.json
+    path: package.json
+    purpose: "Project metadata and dependencies"
+    key_elements:
+      - element: dependencies
+        type: variable
+        location: package.json:12-23
+        description: "next 16.1.6, react 19.2.3, gsap, @gsap/react, lenis, PLUS unused @react-three/fiber, @react-three/drei, three"
+      - element: devDependencies
+        type: variable
+        location: package.json:24-34
+        description: "tailwindcss v4, @tailwindcss/postcss, eslint + eslint-config-next, puppeteer, typescript"
+    language: JSON
+    lines: 36
+
+  - file: postcss.config.mjs
+    path: postcss.config.mjs
+    purpose: "PostCSS config using @tailwindcss/postcss plugin (Tailwind v4 pattern)"
+    language: JavaScript
+    lines: 7
+
+  - file: robots.ts
+    path: app/robots.ts
+    purpose: "Dynamic robots.txt — allows all, disallows /api/, references sitemap at raghdkun.dev"
+    language: TypeScript
+    lines: 13
+
+  - file: sitemap.ts
+    path: app/sitemap.ts
+    purpose: "Dynamic sitemap with filesystem route discovery, lastModified from file stats"
+    language: TypeScript
+    lines: ~65
+
+  - file: eslint.config.mjs
+    path: eslint.config.mjs
+    purpose: "ESLint flat config with next/core-web-vitals and next/typescript presets"
+    language: JavaScript
+    lines: 17
+
+  - file: chrome-audit.mjs
+    path: scripts/chrome-audit.mjs
+    purpose: "Puppeteer-based viewport audit script — captures screenshots and section metrics at mobile/tablet/desktop"
+    language: JavaScript (ESM)
+    lines: ~170
+
+  - file: report.json
+    path: tmp/chrome-audit/report.json
+    purpose: "Chrome audit output with viewport metrics, console errors, overflow detection for 3 viewports"
+    language: JSON
+    lines: ~600
+
+  - file: website.html
+    path: website.html
+    purpose: "Original static HTML prototype of the portfolio — single-file with inline styles, CDN Tailwind, vanilla JS animations"
+    language: HTML
+    lines: large
+
+patterns_found:
+  - category: architecture
+    pattern: "Monolithic client component"
+    description: "The entire page (~1400 lines) is a single 'use client' component. All sections, animations, event listeners, and state management live in one file. This prevents any server-side rendering benefits for static content."
+    examples:
+      - file: app/page.tsx
+        location: "app/page.tsx:1"
+        snippet: '"use client";'
+    prevalence: common
+
+  - category: architecture
+    pattern: "GSAP + CSS reveal double-animation"
+    description: "CSS classes (.reveal, .reveal-left, etc.) define transition-based animations, but GSAP ScrollTrigger also animates the same elements via fromTo(). The GSAP scrub-based approach overrides CSS transitions, making the CSS animation definitions dead code."
+    examples:
+      - file: app/globals.css
+        location: "app/globals.css:86-132"
+        snippet: ".reveal { opacity: 0; transform: translateY(60px); transition: opacity 0.9s ... }"
+      - file: app/page.tsx
+        location: "app/page.tsx:354-370"
+        snippet: 'gsap.utils.toArray<HTMLElement>(".reveal").forEach((el) => { gsap.fromTo(el, { opacity: 0, y: 60 }, ...) })'
+    prevalence: common
+
+  - category: error_handling
+    pattern: "Error message exposure"
+    description: "ErrorBoundary displays this.state.error?.message directly in the UI, which could expose stack traces or sensitive info in production."
+    examples:
+      - file: app/components/ErrorBoundary.tsx
+        location: "app/components/ErrorBoundary.tsx:110"
+        snippet: '{this.state.error?.message || "Unknown error"}'
+    prevalence: occasional
+
+  - category: naming
+    pattern: "Cinematic/film noir naming convention"
+    description: "Consistent theming throughout — 'ACT I', 'REEL', 'CUT!', 'SCENE', film-divider, scratch-line, vignette, etc."
+    examples:
+      - file: app/page.tsx
+        location: "app/page.tsx:921"
+        snippet: 'ACT I — ABOUT'
+    prevalence: common
+
+  - category: structure
+    pattern: "Inline styles mixed with Tailwind"
+    description: "Heavy use of inline style={} objects alongside Tailwind classes. Many styles (backgrounds, filters, fontSize clamp values) are inline rather than in CSS or Tailwind."
+    examples:
+      - file: app/page.tsx
+        location: "app/page.tsx:795"
+        snippet: "style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(10px)' }}"
+    prevalence: common
+
+  - category: error_handling
+    pattern: "Graceful API fallback"
+    description: "GitHub API fetch has AbortController cleanup and falls back to hardcoded repos on failure."
+    examples:
+      - file: app/page.tsx
+        location: "app/page.tsx:122-138"
+        snippet: ".catch(() => { setRepos(fallbackRepos); setLoaded(true); })"
+    prevalence: occasional
+
+  - category: accessibility
+    pattern: "Reduced motion respect"
+    description: "All three components (LoadingScreen, SmoothScroller, page.tsx) check prefers-reduced-motion and skip animations."
+    examples:
+      - file: app/components/LoadingScreen.tsx
+        location: "app/components/LoadingScreen.tsx:96"
+        snippet: 'if (prefersReducedMotion) { onComplete(); return; }'
+      - file: app/components/SmoothScroller.tsx
+        location: "app/components/SmoothScroller.tsx:16"
+        snippet: 'if (prefersReducedMotion || isTouchDevice) { return; }'
+    prevalence: common
+
+  - category: testing
+    pattern: "Puppeteer visual regression"
+    description: "Custom chrome-audit.mjs script captures screenshots at 3 viewports, checks for overflow, section presence, and console errors."
+    examples:
+      - file: scripts/chrome-audit.mjs
+        location: "scripts/chrome-audit.mjs:1-170"
+        snippet: "Puppeteer launch with mobile/tablet/desktop viewports, overflow detection, section metrics"
+    prevalence: rare
+
+related_architecture:
+  components_relevant_to_domain:
+    - component: RootLayout
+      responsibility: "HTML structure, font loading, metadata, wrapping ErrorBoundary + SmoothScroller"
+      location: app/layout.tsx
+      relationship_to_domain: "Entry point — all page content flows through this"
+    - component: Home (page.tsx)
+      responsibility: "ALL page content and interactivity — nav, hero, about, skills, projects, interlude, contact, footer"
+      location: app/page.tsx
+      relationship_to_domain: "Core page — monolithic client component"
+    - component: ErrorBoundary
+      responsibility: "Catches render errors, shows cinematic error UI"
+      location: app/components/ErrorBoundary.tsx
+      relationship_to_domain: "Wraps SmoothScroller + children in layout"
+    - component: SmoothScroller
+      responsibility: "Lenis smooth scroll with GSAP ScrollTrigger integration"
+      location: app/components/SmoothScroller.tsx
+      relationship_to_domain: "Wraps page children in layout"
+    - component: LoadingScreen
+      responsibility: "Cinematic intro loader with fake progress"
+      location: app/components/LoadingScreen.tsx
+      relationship_to_domain: "Rendered conditionally in page.tsx"
+
+  interfaces_used_by_domain:
+    - interface: "Next.js Metadata API"
+      location: app/layout.tsx
+      usage_pattern: "Static metadata export with OG, Twitter, robots config"
+    - interface: "Next.js Image component"
+      location: app/page.tsx
+      usage_pattern: "Used for hero-bg, about-workspace, skills-neural, interlude-bg images"
+    - interface: "GitHub REST API"
+      location: app/page.tsx
+      usage_pattern: "Fetches user repos at runtime (client-side)"
+
+  data_flow_involving_domain: |
+    1. Server renders RootLayout (fonts, metadata) -> ErrorBoundary -> SmoothScroller -> page.tsx shell
+    2. Client hydrates page.tsx as "use client"
+    3. LoadingScreen shows immediately with fake progress
+    4. GitHub API fetched in useEffect, repos stored in state
+    5. On LoadingScreen complete, main content fades in
+    6. GSAP animations mount via useEffect after loading completes
+    7. All scroll interactions handled by Lenis + GSAP ScrollTrigger
+
+  key_relationships_to_domain:
+    - from: layout.tsx
+      to: SmoothScroller
+      relationship: imports
+    - from: layout.tsx
+      to: ErrorBoundary
+      relationship: imports
+    - from: page.tsx
+      to: LoadingScreen
+      relationship: imports
+    - from: page.tsx
+      to: gsap + ScrollTrigger
+      relationship: imports
+    - from: SmoothScroller
+      to: lenis + gsap
+      relationship: imports
+    - from: LoadingScreen
+      to: gsap
+      relationship: imports
+    - from: globals.css
+      to: tailwindcss
+      relationship: imports
+
+related_technology_stack:
+  languages_used_in_domain:
+    - TypeScript
+    - CSS
+    - JavaScript (ESM for configs)
+  frameworks_used_in_domain:
+    - name: Next.js 16.1.6
+      usage_in_domain: "App Router, Image optimization, Metadata API, dynamic robots/sitemap"
+    - name: React 19.2.3
+      usage_in_domain: "Client components, hooks (useRef, useState, useEffect, useCallback), class component for ErrorBoundary"
+    - name: Tailwind CSS v4
+      usage_in_domain: "Utility classes throughout, @tailwindcss/postcss plugin, @theme inline for font variables"
+  libraries_used_in_domain:
+    - name: GSAP 3.14.2
+      purpose_in_domain: "ScrollTrigger animations, parallax, magnetic buttons, counter animations, loading screen exit"
+    - name: "@gsap/react 2.1.2"
+      purpose_in_domain: "Listed as dependency but NOT actually used (no useGSAP hook usage found)"
+    - name: "Lenis 1.3.19"
+      purpose_in_domain: "Smooth scrolling with GSAP ticker integration"
+    - name: "@react-three/fiber 9.5.0"
+      purpose_in_domain: "UNUSED — no imports found anywhere in the app"
+    - name: "@react-three/drei 10.7.7"
+      purpose_in_domain: "UNUSED — no imports found anywhere in the app"
+    - name: "three 0.183.2"
+      purpose_in_domain: "UNUSED — no imports found anywhere in the app"
+  external_apis_used_in_domain:
+    - name: "GitHub REST API"
+      integration_point: "app/page.tsx:122 — fetches /users/Raghdkun/repos client-side"
+
+related_conventions:
+  naming_patterns_in_domain: "Cinematic film noir theme (ACT I, REEL, CUT!, etc.); CSS classes use kebab-case (film-divider, scratch-line, btn-cine); Components use PascalCase"
+  structure_of_domain: "Flat app/ directory with single page route; components in app/components/; no lib/, utils/, or hooks/ directories"
+  error_handling_in_domain: "ErrorBoundary at layout level catches render errors; GitHub API fetch has try/catch with fallback; no error monitoring (Sentry, etc.)"
+  testing_in_domain: "No unit/integration tests; only a Puppeteer-based chrome-audit.mjs script for visual regression"
+  documentation_in_domain: "README.md exists but not examined; inline comments in page.tsx use section separator comments (═══ SECTION NAME ═══)"
+
+related_dependencies:
+  internal:
+    - component: "layout.tsx -> ErrorBoundary"
+      relationship_to_domain: "Wraps all page content"
+      direction: outbound
+    - component: "layout.tsx -> SmoothScroller"
+      relationship_to_domain: "Wraps all page content inside ErrorBoundary"
+      direction: outbound
+    - component: "page.tsx -> LoadingScreen"
+      relationship_to_domain: "Conditional render during loading state"
+      direction: outbound
+    - component: "globals.css -> all components"
+      relationship_to_domain: "Provides base styles, animation classes, component styles"
+      direction: outbound
+  external:
+    - name: "gsap + gsap/ScrollTrigger"
+      purpose_for_domain: "Core animation engine for all scroll-based effects"
+    - name: "lenis"
+      purpose_for_domain: "Smooth scroll behavior on desktop"
+    - name: "next/image"
+      purpose_for_domain: "Optimized image loading with AVIF/WebP"
+    - name: "next/font/google"
+      purpose_for_domain: "Self-hosted Google Fonts with CSS variable injection"
+
+domain_security_considerations:
+  sensitive_areas:
+    - area: "Error message exposure"
+      location: "app/components/ErrorBoundary.tsx:110"
+      concern: "Raw error.message displayed to users — could expose internal paths, stack traces"
+    - area: "External API call without rate limiting"
+      location: "app/page.tsx:122"
+      concern: "Client-side GitHub API call has no caching or rate-limit handling; may hit 60 req/hr unauthenticated limit"
+    - area: "Personal contact info in source"
+      location: "app/page.tsx:12-13"
+      concern: "WhatsApp number and email hardcoded in client bundle — visible in source"
+  authentication_patterns_in_domain: "N/A — static portfolio site"
+  authorization_patterns_in_domain: "N/A"
+  data_validation_in_domain: "GitHub API response typed as Repo[] but no runtime validation (no zod/schema check)"
+
+testing_patterns:
+  framework: "Puppeteer (manual script, not test runner)"
+  coverage_areas:
+    - "Screenshot capture at 3 viewports"
+    - "Section presence detection"
+    - "Horizontal overflow detection"
+    - "Console error logging"
+  test_organization: "Single script at scripts/chrome-audit.mjs, output to tmp/chrome-audit/"
+  mock_patterns:
+    - "None — tests against live dev server"
+
+open_questions:
+  - question: "Is the hero-bg.png intentionally kept alongside hero-bg.webp, or is it a leftover?"
+    context: "public/images/ has both hero-bg.png and hero-bg.webp, but page.tsx references hero-bg.png. The .webp version may be unused or the .png should be replaced."
+  - question: "Why are @react-three/fiber, @react-three/drei, and three in dependencies?"
+    context: "No imports found for these packages anywhere in the app. They add ~2MB+ to node_modules. Possibly planned for future 3D features or leftover from experimentation."
+  - question: "Is the interlude section intentionally missing the loading='eager' prop on its Image?"
+    context: "Chrome audit flagged interlude-bg.webp as LCP element but it lacks priority or loading='eager'. On mobile, it may be below fold so this could be intentional."
+  - question: "Should the website.html file be kept in the repo?"
+    context: "It appears to be the original static prototype. The entire design has been ported to Next.js. May be useful as reference or may be dead weight."
+
+gaps:
+  - area: "No viewport meta tag override"
+    description: "layout.tsx doesn't export a viewport config. Next.js uses default viewport, but explicit viewport export with themeColor would be better."
+    impact: "Missing theme-color meta tag for mobile browser chrome theming."
+  - area: "No structured data / JSON-LD"
+    description: "No schema.org markup for Person, WebSite, or Portfolio. Would help with SEO."
+    impact: "Reduced rich snippet potential in search results."
+  - area: "No analytics or error monitoring"
+    description: "No Sentry, LogRocket, Google Analytics, or similar services integrated."
+    impact: "No visibility into production errors or user behavior."
+  - area: "Incomplete OG metadata"
+    description: "No og:image specified in metadata. Twitter card set to 'summary' not 'summary_large_image'."
+    impact: "Social sharing will show no preview image."
+  - area: "No web font fallback metrics"
+    description: "Google Fonts with display:swap are good, but no adjustFontFallback or font-size-adjust for CLS reduction."
+    impact: "Potential layout shift during font loading."

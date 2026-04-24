@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" role="img" aria-label="Modern Web OS — desktop-style web shell">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050a18"/>
+      <stop offset="50%" stop-color="#0a1430"/>
+      <stop offset="100%" stop-color="#020615"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="window" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0a1226" stop-opacity="0.85"/>
+    </linearGradient>
+    <radialGradient id="cursor-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#3b82f6" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#bg)"/>
+  <rect width="1440" height="900" fill="url(#grid)"/>
+
+  <!-- Wallpaper glow -->
+  <ellipse cx="720" cy="380" rx="700" ry="320" fill="#1e3a8a" opacity="0.25"/>
+
+  <!-- Top status bar -->
+  <rect x="0" y="0" width="1440" height="36" fill="#0a1226" opacity="0.9"/>
+  <line x1="0" y1="36" x2="1440" y2="36" stroke="#60a5fa" stroke-opacity="0.3"/>
+  <text x="32" y="23" font-family="JetBrains Mono, monospace" font-size="11" fill="#93c5fd" letter-spacing="2">▣ MODERN WEB OS</text>
+  <text x="700" y="23" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#93c5fd" letter-spacing="2">10:24 AM · TUE 21 APR</text>
+  <text x="1408" y="23" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#93c5fd" letter-spacing="2">⚡ 84% · ◉ ONLINE</text>
+
+  <!-- Window 1: Terminal -->
+  <g transform="translate(80,140)">
+    <rect width="560" height="360" rx="10" fill="url(#window)" stroke="#3b82f6" stroke-opacity="0.45"/>
+    <rect width="560" height="32" rx="10" fill="#0a1226"/>
+    <rect y="22" width="560" height="10" fill="#0a1226"/>
+    <circle cx="18" cy="16" r="5" fill="#ef4444" opacity="0.7"/>
+    <circle cx="36" cy="16" r="5" fill="#f59e0b" opacity="0.7"/>
+    <circle cx="54" cy="16" r="5" fill="#22c55e" opacity="0.7"/>
+    <text x="280" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#60a5fa" letter-spacing="2">~/raghdkun — zsh</text>
+    <g font-family="JetBrains Mono, monospace" font-size="13" fill="#cbd5f5">
+      <text x="20" y="64">$ uname -a</text>
+      <text x="20" y="86" fill="#60a5fa">ModernWebOS 1.0 · React + Next.js</text>
+      <text x="20" y="116">$ ls /apps</text>
+      <text x="20" y="138" fill="#93c5fd">finder  terminal  browser  notes  settings</text>
+      <text x="20" y="170">$ open browser --url=raghdkun.dev</text>
+      <text x="20" y="192" fill="#22d3ee">▸ launching window…</text>
+      <text x="20" y="222">$ status</text>
+      <text x="20" y="244" fill="#a5b4fc">windowing  ✓   draggable  ✓   resizable  ✓</text>
+      <text x="20" y="266" fill="#a5b4fc">multi-app  ✓   keyboard   ✓   themed     ✓</text>
+      <text x="20" y="296">$ <tspan fill="#60a5fa">_</tspan></text>
+    </g>
+  </g>
+
+  <!-- Window 2: App grid / launcher -->
+  <g transform="translate(720,180)">
+    <rect width="640" height="420" rx="10" fill="url(#window)" stroke="#60a5fa" stroke-opacity="0.6"/>
+    <rect width="640" height="32" rx="10" fill="#0a1226"/>
+    <rect y="22" width="640" height="10" fill="#0a1226"/>
+    <text x="20" y="20" font-family="JetBrains Mono, monospace" font-size="11" fill="#93c5fd" letter-spacing="2">// LAUNCHPAD</text>
+    <text x="620" y="20" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#60a5fa" letter-spacing="2">⊟ ⊠ ✕</text>
+
+    <!-- App tiles -->
+    <g font-family="Space Grotesk, sans-serif" font-size="11" fill="#dbeafe" text-anchor="middle">
+      <!-- Row 1 -->
+      <g transform="translate(40,60)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">▣</text>
+        <text x="60" y="98">FINDER</text>
+      </g>
+      <g transform="translate(180,60)">
+        <rect width="120" height="120" rx="14" fill="#1e40af" opacity="0.55" stroke="#60a5fa" stroke-opacity="0.6"/>
+        <text x="60" y="58" font-size="34" fill="#bfdbfe">⌘</text>
+        <text x="60" y="98">TERMINAL</text>
+      </g>
+      <g transform="translate(320,60)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">◉</text>
+        <text x="60" y="98">BROWSER</text>
+      </g>
+      <g transform="translate(460,60)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">✎</text>
+        <text x="60" y="98">NOTES</text>
+      </g>
+      <!-- Row 2 -->
+      <g transform="translate(40,200)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">♫</text>
+        <text x="60" y="98">MUSIC</text>
+      </g>
+      <g transform="translate(180,200)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">⚙</text>
+        <text x="60" y="98">SETTINGS</text>
+      </g>
+      <g transform="translate(320,200)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">▤</text>
+        <text x="60" y="98">CALENDAR</text>
+      </g>
+      <g transform="translate(460,200)">
+        <rect width="120" height="120" rx="14" fill="#1e3a8a" opacity="0.55" stroke="#3b82f6" stroke-opacity="0.5"/>
+        <text x="60" y="58" font-size="34" fill="#93c5fd">+</text>
+        <text x="60" y="98">ADD APP</text>
+      </g>
+    </g>
+
+    <text x="20" y="400" font-family="JetBrains Mono, monospace" font-size="10" fill="#60a5fa" letter-spacing="3">DRAG · DROP · RESIZE · SNAP</text>
+  </g>
+
+  <!-- Cursor glow -->
+  <circle cx="780" cy="320" r="120" fill="url(#cursor-glow)"/>
+
+  <!-- Dock -->
+  <g transform="translate(420,800)">
+    <rect width="600" height="60" rx="14" fill="#0a1226" opacity="0.85" stroke="#3b82f6" stroke-opacity="0.4"/>
+    <g font-family="Space Grotesk, sans-serif" font-size="22" fill="#93c5fd" text-anchor="middle">
+      <text x="60" y="38">▣</text>
+      <text x="135" y="38">⌘</text>
+      <text x="210" y="38">◉</text>
+      <text x="285" y="38">✎</text>
+      <text x="360" y="38">♫</text>
+      <text x="435" y="38">▤</text>
+      <text x="540" y="38">⚙</text>
+    </g>
+    <line x1="495" y1="14" x2="495" y2="46" stroke="#3b82f6" stroke-opacity="0.4"/>
+  </g>
+
+  <!-- Title overlay -->
+  <g transform="translate(80,640)">
+    <rect width="22" height="22" fill="none" stroke="#60a5fa" stroke-opacity="0.7"/>
+    <text x="40" y="18" font-family="JetBrains Mono, monospace" font-size="12" fill="#60a5fa" letter-spacing="4">// MODERN WEB OS · DESKTOP-STYLE WEB SHELL</text>
+    <text x="0" y="62" font-family="Space Grotesk, sans-serif" font-size="46" font-weight="700" fill="#dbeafe" letter-spacing="1">MODERN WEB OS</text>
+    <text x="0" y="92" font-family="JetBrains Mono, monospace" font-size="13" fill="#93c5fd" letter-spacing="3">REACT · WINDOW MANAGER · DRAGGABLE APPS · OPEN SOURCE</text>
+    <rect x="0" y="106" width="320" height="2" fill="url(#glow)"/>
+  </g>
+
+  <!-- Corner ticks -->
+  <g stroke="#60a5fa" stroke-opacity="0.7" stroke-width="2" fill="none">
+    <path d="M16 16 L16 56 M16 16 L56 16"/>
+    <path d="M1424 16 L1424 56 M1424 16 L1384 16"/>
+    <path d="M16 884 L16 844 M16 884 L56 884"/>
+    <path d="M1424 884 L1424 844 M1424 884 L1384 884"/>
+  </g>
+</svg>

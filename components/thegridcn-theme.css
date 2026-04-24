@@ -1,0 +1,82 @@
+:root {
+  --panel: #0C1421;
+}
+
+/* Core deep navy backgrounds — midnight with electric blue accent */
+:root {
+  --background: oklch(0.10 0.045 260);
+  --foreground: oklch(0.96 0.02 240);
+
+  /* Cards & Popovers - Slightly lifted navy panel */
+  --card: oklch(0.14 0.05 260);
+  --card-foreground: oklch(0.94 0.02 240);
+  --popover: oklch(0.13 0.05 260);
+  --popover-foreground: oklch(0.94 0.02 240);
+
+  /* Destructive */
+  --destructive: oklch(0.6 0.23 25);
+
+  /* Sidebar base */
+  --sidebar: oklch(0.11 0.045 260);
+  --sidebar-foreground: oklch(0.94 0.02 240);
+
+  /* Border radius */
+  --radius: 0.5rem;
+}
+
+/* Base styles */
+* {
+  border-color: var(--border);
+  outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================
+   THEME: DEEP BLUE — Midnight + Electric Blue
+   ============================================ */
+:root {
+  --primary: oklch(0.7 0.2 258);
+  --primary-foreground: oklch(0.08 0.04 260);
+
+  --secondary: oklch(0.2 0.06 258);
+  --secondary-foreground: oklch(0.96 0 0);
+
+  --muted: oklch(0.17 0.045 258);
+  --muted-foreground: oklch(0.7 0.03 250);
+
+  --accent: oklch(0.65 0.2 258);
+  --accent-foreground: oklch(0.08 0.04 260);
+
+  --border: oklch(0.4 0.14 258);
+  --input: oklch(0.22 0.07 258);
+  --ring: oklch(0.7 0.2 258);
+
+  --glow: oklch(0.7 0.22 258);
+  --glow-muted: oklch(0.5 0.16 258);
+
+  --chart-1: oklch(0.7 0.2 258);
+  --chart-2: oklch(0.65 0.18 240);
+  --chart-3: oklch(0.75 0.16 270);
+  --chart-4: oklch(0.6 0.22 250);
+  --chart-5: oklch(0.8 0.12 255);
+
+  --sidebar-primary: oklch(0.7 0.2 258);
+  --sidebar-primary-foreground: oklch(0.08 0.04 260);
+  --sidebar-accent: oklch(0.2 0.06 258);
+  --sidebar-accent-foreground: oklch(0.96 0 0);
+  --sidebar-border: oklch(0.4 0.14 258);
+  --sidebar-ring: oklch(0.7 0.2 258);
+}
