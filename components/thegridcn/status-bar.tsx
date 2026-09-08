@@ -17,9 +17,9 @@ export function StatusBar({
   ...props
 }: StatusBarProps) {
   const variantStyles = {
-    default: "bg-muted/50 border-border",
+    default: "bg-muted/50 border-border/60",
     alert: "bg-red-500/10 border-red-500/50",
-    info: "bg-cyan-500/10 border-cyan-500/50",
+    info: "bg-primary/10 border-primary/40",
   }
 
   return (
@@ -27,16 +27,16 @@ export function StatusBar({
       data-slot="tron-status-bar"
       data-variant={variant}
       className={cn(
-        "flex items-center justify-between border-y px-4 py-2 font-mono text-xs uppercase tracking-widest",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-y px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] sm:px-4 sm:text-xs sm:tracking-widest",
         variantStyles[variant],
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-4 text-foreground/80">
+      <div className="flex min-w-0 items-center gap-3 text-foreground/80">
         {leftContent}
       </div>
-      <div className="flex items-center gap-4 text-foreground/80">
+      <div className="flex min-w-0 items-center gap-3 text-foreground/80">
         {rightContent}
       </div>
     </div>
@@ -60,9 +60,9 @@ export function InfoPanel({
   ...props
 }: InfoPanelProps) {
   const statusIndicator = {
-    active: "bg-green-500",
+    active: "bg-emerald-500",
     pending: "bg-amber-500 animate-pulse",
-    complete: "bg-cyan-500",
+    complete: "bg-primary",
   }
 
   return (
@@ -116,6 +116,14 @@ interface UplinkBarProps extends React.HTMLAttributes<HTMLDivElement> {
   signal?: "strong" | "medium" | "weak"
 }
 
+function Bolt({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" />
+    </svg>
+  )
+}
+
 export function UplinkBar({
   channel,
   status,
@@ -132,14 +140,14 @@ export function UplinkBar({
   return (
     <div
       className={cn(
-        "flex items-center justify-between border-y border-cyan-500/30 bg-cyan-500/5 px-4 py-2 font-mono text-xs",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-y border-primary/30 bg-primary/5 px-3 py-2 font-mono text-[11px] sm:px-4 sm:text-xs",
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-cyan-400">⚡</span>
-        <span className="uppercase tracking-widest text-cyan-500">
+      <div className="flex min-w-0 items-center gap-2">
+        <Bolt className="size-3.5 shrink-0 text-primary" />
+        <span className="truncate uppercase tracking-widest text-primary">
           UPLINK: {channel}
         </span>
       </div>
@@ -152,13 +160,13 @@ export function UplinkBar({
         )}
 
         {/* Signal strength */}
-        <div className="flex items-end gap-0.5">
+        <div className="flex items-end gap-0.5" aria-hidden="true">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
               className={cn(
                 "w-1 rounded-t",
-                i < signalBars[signal] ? "bg-cyan-500" : "bg-cyan-500/20"
+                i < signalBars[signal] ? "bg-primary" : "bg-primary/20"
               )}
               style={{ height: `${(i + 1) * 3 + 2}px` }}
             />

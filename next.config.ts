@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+    // Local images: no query, or the exact `?v=2` cache-bust used on re-captured screenshots.
+    // Exact `search` values are required (Next 16) to prevent optimizer URL enumeration.
+    localPatterns: [
+      { pathname: "/images/**", search: "" },
+      { pathname: "/images/**", search: "?v=2" },
+    ],
     remotePatterns: [
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
       { protocol: "https", hostname: "raw.githubusercontent.com" },

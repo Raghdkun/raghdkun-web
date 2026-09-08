@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useInView, usePrefersReducedMotion } from "@/lib/use-in-view"
 
 interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number
@@ -16,14 +17,14 @@ interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantColors: Record<string, { bar: string; glow: string }> = {
   default: { bar: "bg-primary", glow: "shadow-[0_0_8px_var(--primary)]" },
-  success: { bar: "bg-green-500", glow: "shadow-[0_0_8px_rgba(34,197,94,0.5)]" },
+  success: { bar: "bg-emerald-500", glow: "shadow-[0_0_8px_rgba(16,185,129,0.5)]" },
   warning: { bar: "bg-amber-500", glow: "shadow-[0_0_8px_rgba(245,158,11,0.5)]" },
   danger: { bar: "bg-red-500", glow: "shadow-[0_0_8px_rgba(239,68,68,0.5)]" },
 }
 
 const sizeConfig: Record<string, { track: string; text: string }> = {
-  sm: { track: "h-1.5", text: "text-[9px]" },
-  md: { track: "h-2.5", text: "text-[10px]" },
+  sm: { track: "h-1.5", text: "text-[10px]" },
+  md: { track: "h-2.5", text: "text-[10px] sm:text-[11px]" },
   lg: { track: "h-4", text: "text-xs" },
 }
 
@@ -43,37 +44,45 @@ export function ProgressBar({
   const colors = variantColors[variant]
   const sizeC = sizeConfig[size]
 
-  // Animate fill from 0
-  const [displayPct, setDisplayPct] = React.useState(animated ? 0 : pct)
+  // Server-render the final width so the bar is meaningful without JS / with reduced motion.
+  // On the client, collapse to 0 while off-screen and fill once the bar scrolls into view.
+  const [ref, inView] = useInView<HTMLDivElement>()
+  const reduce = usePrefersReducedMotion()
+  const [displayPct, setDisplayPct] = React.useState(pct)
+
   React.useEffect(() => {
-    if (!animated) { setDisplayPct(pct); return }
+    if (!animated || reduce) { setDisplayPct(pct); return }
+    if (!inView) { setDisplayPct(0); return }
+    let raf = 0
     const start = performance.now()
-    const duration = 600
-    function tick(now: number) {
+    const duration = 900
+    const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
+      const eased = 1 - Math.pow(1 - progress, 4)
       setDisplayPct(pct * eased)
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) raf = requestAnimationFrame(tick)
     }
-    requestAnimationFrame(tick)
-  }, [pct, animated])
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [pct, animated, reduce, inView])
 
   return (
     <div
+      ref={ref}
       data-slot="tron-progress-bar"
       className={cn("relative", className)}
       {...props}
     >
       {/* Label row */}
       {(label || showValue) && (
-        <div className="mb-1.5 flex items-center justify-between">
+        <div className="mb-1.5 flex items-center justify-between gap-3">
           {label && (
-            <span className={cn("font-mono uppercase tracking-widest text-foreground/50", sizeC.text)}>
+            <span className={cn("font-mono uppercase tracking-widest text-foreground/60", sizeC.text)}>
               {label}
             </span>
           )}
           {showValue && (
-            <span className={cn("font-mono tabular-nums text-foreground/60", sizeC.text)}>
+            <span className={cn("font-mono tabular-nums text-foreground/70", sizeC.text)}>
               {Math.round(displayPct)}%
             </span>
           )}
@@ -81,10 +90,17 @@ export function ProgressBar({
       )}
 
       {/* Track */}
-      <div className={cn(
-        "relative overflow-hidden rounded-sm bg-foreground/10",
-        sizeC.track
-      )}>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(pct)}
+        className={cn(
+          "relative overflow-hidden rounded-sm bg-foreground/10",
+          sizeC.track
+        )}
+      >
         {/* Fill */}
         <div
           className={cn(

@@ -3,12 +3,41 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+type Action = { label: string; href?: string; onClick?: () => void }
+
 interface CTABannerProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string
   description?: string
-  primaryAction?: { label: string; onClick?: () => void }
-  secondaryAction?: { label: string; onClick?: () => void }
+  primaryAction?: Action
+  secondaryAction?: Action
   variant?: "default" | "highlight"
+}
+
+function ActionButton({ action, primary }: { action: Action; primary?: boolean }) {
+  const className = cn(
+    "press inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded px-6 font-mono text-xs uppercase tracking-widest transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 sm:w-auto",
+    primary
+      ? "border border-primary bg-primary text-primary-foreground shadow-[0_0_16px_rgba(var(--primary-rgb),0.25)] hover:bg-primary/90"
+      : "border border-primary/30 text-foreground/70 hover:border-primary/50 hover:text-primary"
+  )
+  if (action.href) {
+    const external = action.href.startsWith("http")
+    return (
+      <a
+        href={action.href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+        className={className}
+      >
+        {action.label}
+      </a>
+    )
+  }
+  return (
+    <button type="button" onClick={action.onClick} className={className}>
+      {action.label}
+    </button>
+  )
 }
 
 export function CTABanner({
@@ -24,9 +53,9 @@ export function CTABanner({
     <div
       data-slot="tron-cta-banner"
       className={cn(
-        "group relative overflow-hidden rounded border bg-card/80 px-6 py-8 text-center backdrop-blur-sm",
+        "group relative overflow-hidden rounded border bg-card/80 px-5 py-8 text-center backdrop-blur-sm sm:px-8 sm:py-10",
         variant === "highlight"
-          ? "border-primary/50 shadow-[0_0_40px_rgba(var(--primary-rgb,0,180,255),0.08)]"
+          ? "border-primary/50 shadow-[0_0_40px_rgba(var(--primary-rgb),0.08)]"
           : "border-primary/20",
         className
       )}
@@ -35,8 +64,8 @@ export function CTABanner({
       {/* Scanline overlay */}
       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.03)_2px,rgba(0,0,0,0.03)_4px)]" />
 
-      {/* Animated top border glow */}
-      <div className="pointer-events-none absolute left-0 right-0 top-0 h-px">
+      {/* Animated top border glow (transform-only, GPU friendly) */}
+      <div className="pointer-events-none absolute left-0 right-0 top-0 h-px overflow-hidden">
         <div
           className="h-full w-1/3 bg-gradient-to-r from-transparent via-primary/60 to-transparent"
           style={{ animation: "ctaSweep 4s ease-in-out infinite" }}
@@ -45,41 +74,27 @@ export function CTABanner({
 
       <style jsx>{`
         @keyframes ctaSweep {
-          0%, 100% { margin-left: -10%; }
-          50% { margin-left: 77%; }
+          0%, 100% { transform: translateX(-30%); }
+          50% { transform: translateX(230%); }
         }
       `}</style>
 
       {/* Content */}
       <div className="relative">
-        <h3 className="font-display text-lg font-bold uppercase tracking-wider text-foreground md:text-xl">
+        <h3 className="font-display text-xl font-bold uppercase tracking-wider text-foreground sm:text-2xl">
           {title}
         </h3>
         {description && (
-          <p className="mx-auto mt-2 max-w-md text-sm text-foreground/60">
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-foreground/65">
             {description}
           </p>
         )}
 
-        {/* Actions */}
+        {/* Actions: full-width stacked on phones, inline from sm */}
         {(primaryAction || secondaryAction) && (
-          <div className="mt-5 flex items-center justify-center gap-3">
-            {primaryAction && (
-              <button
-                onClick={primaryAction.onClick}
-                className="rounded border border-primary bg-primary/20 px-5 py-2 font-mono text-[10px] uppercase tracking-widest text-primary shadow-[0_0_12px_rgba(var(--primary-rgb,0,180,255),0.15)] transition-all duration-300 hover:bg-primary/30"
-              >
-                {primaryAction.label}
-              </button>
-            )}
-            {secondaryAction && (
-              <button
-                onClick={secondaryAction.onClick}
-                className="rounded border border-primary/30 px-5 py-2 font-mono text-[10px] uppercase tracking-widest text-foreground/60 transition-colors hover:border-primary/50 hover:text-primary"
-              >
-                {secondaryAction.label}
-              </button>
-            )}
+          <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+            {primaryAction && <ActionButton action={primaryAction} primary />}
+            {secondaryAction && <ActionButton action={secondaryAction} />}
           </div>
         )}
       </div>

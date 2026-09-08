@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
-    "audit": "node scripts/chrome-audit.mjs"
+    "audit": "node scripts/chrome-audit.mjs",
+    "capture": "node scripts/capture-projects.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

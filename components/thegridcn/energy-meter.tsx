@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useInView, usePrefersReducedMotion } from "@/lib/use-in-view"
 
 interface EnergyMeterProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number
@@ -47,40 +48,47 @@ export function EnergyMeter({
   const colors = variantColors[variant]
   const isVertical = orientation === "vertical"
 
-  // Staggered segment fill animation
-  const [visibleCount, setVisibleCount] = React.useState(0)
+  // Render full on the server; on the client, empty while off-screen and fill
+  // segment-by-segment once the meter scrolls into view (skipped under reduced motion).
+  const [ref, inView] = useInView<HTMLDivElement>()
+  const reduce = usePrefersReducedMotion()
+  const [visibleCount, setVisibleCount] = React.useState(filledCount)
+  const [displayPercent, setDisplayPercent] = React.useState(clamped)
 
   React.useEffect(() => {
-    if (filledCount === 0) {
-      setVisibleCount(0)
-      return
-    }
+    if (reduce) { setVisibleCount(filledCount); setDisplayPercent(clamped); return }
+    if (!inView) { setVisibleCount(0); setDisplayPercent(0); return }
+
     let current = 0
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       current++
       setVisibleCount(current)
-      if (current >= filledCount) clearInterval(interval)
+      if (current >= filledCount) window.clearInterval(interval)
     }, 60)
-    return () => clearInterval(interval)
-  }, [filledCount])
 
-  // Animate counter
-  const [displayPercent, setDisplayPercent] = React.useState(0)
-  React.useEffect(() => {
+    let raf = 0
     const duration = filledCount * 60 + 100
     const start = performance.now()
-    function tick(now: number) {
+    const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setDisplayPercent(Math.round(clamped * eased))
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) raf = requestAnimationFrame(tick)
     }
-    requestAnimationFrame(tick)
-  }, [clamped, filledCount])
+    raf = requestAnimationFrame(tick)
+
+    return () => { window.clearInterval(interval); cancelAnimationFrame(raf) }
+  }, [clamped, filledCount, inView, reduce])
 
   return (
     <div
+      ref={ref}
       data-slot="tron-energy-meter"
+      role="meter"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={clamped}
       className={cn(
         "relative overflow-hidden rounded border border-primary/30 bg-card/80 p-3 backdrop-blur-sm",
         className
@@ -92,9 +100,9 @@ export function EnergyMeter({
 
       {/* Label + Value header */}
       {(label || showValue) && (
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between gap-3">
           {label && (
-            <span className="text-[10px] uppercase tracking-widest text-foreground/80">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-foreground/80 sm:text-[11px]">
               {label}
             </span>
           )}
@@ -108,6 +116,7 @@ export function EnergyMeter({
 
       {/* Segments */}
       <div
+        aria-hidden="true"
         className={cn(
           "flex gap-1",
           isVertical && "flex-col-reverse items-center"
@@ -120,7 +129,7 @@ export function EnergyMeter({
             <div
               key={i}
               className={cn(
-                "rounded-sm transition-all",
+                "rounded-sm transition-[background-color,box-shadow,transform]",
                 isVertical ? "h-2 w-full" : "h-6 flex-1",
                 isFilled
                   ? cn(colors.filled, "duration-150")

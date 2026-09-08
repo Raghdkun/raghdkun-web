@@ -36,7 +36,8 @@ for (const viewport of VIEWPORTS) {
 
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
     expect(metrics.overflowingCards).toBe(0);
-    await expect(page.locator("#projects")).toContainText(/Trucking360/i);
+    // Projects section temporarily disabled — see app/page.tsx
+    // await expect(page.locator("#projects")).toContainText(/Trucking360/i);
     await expect(page.locator("footer")).toContainText(String(new Date().getFullYear()));
 
     if (viewport.mobileNav) {
@@ -44,7 +45,7 @@ for (const viewport of VIEWPORTS) {
       await expect(menuButton).toBeVisible();
       await menuButton.click();
       const mobileNav = page.locator("header nav").last();
-      await expect(mobileNav.getByRole("link", { name: /03 \/\/ PROJECTS/i })).toBeVisible();
+      await expect(mobileNav.getByRole("link", { name: /02 \/\/ CONTACT/i })).toBeVisible();
       await expect(mobileNav.getByRole("link", { name: /GET IN TOUCH/i })).toBeVisible();
     } else {
       await expect(page.getByRole("navigation", { name: /primary/i })).toBeVisible();
@@ -59,7 +60,7 @@ test("reduced motion keeps content accessible", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  for (const selector of ["#hero", "#about", "#skills", "#projects", "#contact"]) {
+  for (const selector of ["#hero", "#about", "#contact"]) {
     await expect(page.locator(selector)).toBeVisible();
   }
 

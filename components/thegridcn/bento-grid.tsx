@@ -18,40 +18,33 @@ interface BentoGridProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const spanMap: Record<string, string> = {
   "1x1": "",
-  "2x1": "md:col-span-2",
-  "1x2": "md:row-span-2",
-  "2x2": "md:col-span-2 md:row-span-2",
+  "2x1": "sm:col-span-2",
+  "1x2": "sm:row-span-2",
+  "2x2": "sm:col-span-2 sm:row-span-2",
 }
 
 const colsMap: Record<number, string> = {
-  2: "md:grid-cols-2",
-  3: "md:grid-cols-3",
-  4: "md:grid-cols-4",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+  4: "sm:grid-cols-2 lg:grid-cols-4",
 }
 
+/**
+ * Entrance motion is owned by the page-level ScrollTrigger reveal (data-reveal),
+ * so the grid itself is always rendered visible: no mount-time stagger that would
+ * run off-screen, and nothing is hidden for no-JS or reduced-motion users.
+ */
 export function BentoGrid({
   items,
   columns = 3,
   className,
   ...props
 }: BentoGridProps) {
-  // Stagger card reveal
-  const [revealedIdx, setRevealedIdx] = React.useState(-1)
-  React.useEffect(() => {
-    let idx = 0
-    const interval = setInterval(() => {
-      setRevealedIdx(idx)
-      idx++
-      if (idx >= items.length) clearInterval(interval)
-    }, 80)
-    return () => clearInterval(interval)
-  }, [items.length])
-
   return (
     <div
       data-slot="tron-bento-grid"
       className={cn(
-        "grid gap-3 grid-cols-1",
+        "grid grid-cols-1 gap-3",
         colsMap[columns],
         className
       )}
@@ -61,14 +54,11 @@ export function BentoGrid({
         <div
           key={i}
           className={cn(
-            "group relative overflow-hidden rounded border bg-card/80 p-5 backdrop-blur-sm transition-all duration-400",
+            "group relative overflow-hidden rounded border bg-card/80 p-5 transition-[border-color,box-shadow] duration-300",
             item.variant === "highlight"
-              ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary-rgb,0,180,255),0.06)]"
-              : "border-primary/20",
-            spanMap[item.span || "1x1"],
-            i <= revealedIdx
-              ? "translate-y-0 opacity-100"
-              : "translate-y-3 opacity-0"
+              ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary-rgb),0.06)]"
+              : "border-primary/20 hover:border-primary/40",
+            spanMap[item.span || "1x1"]
           )}
         >
           {/* Scanline overlay */}
@@ -92,7 +82,7 @@ export function BentoGrid({
               {item.title}
             </h3>
             {item.description && (
-              <p className="mt-1.5 text-xs leading-relaxed text-foreground/50">
+              <p className="mt-1.5 text-xs leading-relaxed text-foreground/55">
                 {item.description}
               </p>
             )}

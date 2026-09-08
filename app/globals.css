@@ -119,11 +119,23 @@ body::before {
 .glow { box-shadow: 0 0 20px color-mix(in oklch, var(--primary) 35%, transparent); }
 .glow-sm { box-shadow: 0 0 10px color-mix(in oklch, var(--primary) 25%, transparent); }
 .glow-lg { box-shadow: 0 0 40px color-mix(in oklch, var(--primary) 45%, transparent); }
-.glow-border:hover {
-  box-shadow: 0 0 24px color-mix(in oklch, var(--primary) 40%, transparent);
-  border-color: color-mix(in oklch, var(--primary) 80%, transparent);
+/* Hover-only glow: never fires on touch, where :hover sticks after a tap */
+@media (hover: hover) and (pointer: fine) {
+  .glow-border:hover {
+    box-shadow: 0 0 24px color-mix(in oklch, var(--primary) 40%, transparent);
+    border-color: color-mix(in oklch, var(--primary) 80%, transparent);
+  }
 }
 .glow-pulse { animation: glowPulse 2.4s ease-in-out infinite; }
+
+/* Press feedback for anything clickable (Emil: buttons must feel responsive) */
+.press {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.press:active { transform: scale(0.98); }
+
+/* Stats and any numeric readouts align on tabular figures */
+.tabular { font-variant-numeric: tabular-nums; }
 @keyframes glowPulse {
   0%, 100% { box-shadow: 0 0 12px color-mix(in oklch, var(--primary) 25%, transparent); }
   50% { box-shadow: 0 0 28px color-mix(in oklch, var(--primary) 55%, transparent); }
@@ -177,4 +189,10 @@ html[dir="rtl"] .font-display {
     scroll-behavior: auto !important;
   }
   body::before { display: none; }
+}
+
+/* Arabic never gets tracking: letter-spacing breaks contextual glyph joining and
+   makes headings read as isolated letters. Latin islands (dir="ltr") keep theirs. */
+html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6, [class*="tracking-"]):not([dir="ltr"]) {
+  letter-spacing: 0 !important;
 }

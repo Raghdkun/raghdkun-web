@@ -4,10 +4,13 @@ import * as React from "react";
 
 export type Locale = "en" | "ar";
 
+type Field = { label: string; value: string };
+
 export type Dict = {
   htmlLang: string;
   dir: "ltr" | "rtl";
   toggleLabel: string;
+  toggleAria: string;
   nav: {
     about: string;
     skills: string;
@@ -19,7 +22,7 @@ export type Dict = {
     menuOpen: string;
     menuClose: string;
   };
-  announcement: { text: string; action: string };
+  announcement: { text: string; action: string; dismiss: string };
   hero: {
     chipAvailable: string;
     chipRole: string;
@@ -30,16 +33,15 @@ export type Dict = {
     bio: string;
     ctaPrimary: string;
     ctaSecondary: string;
-    versionBadge: string;
     profileSubtitle: string;
     profileTitle: string;
     fields: {
-      role: { label: string; value: string };
-      stack: { label: string; value: string };
-      extra: { label: string; value: string };
-      base: { label: string; value: string };
-      channel: { label: string; value: string };
-      status: { label: string; value: string };
+      focus: Field;
+      openTo: Field;
+      timezone: Field;
+      languages: Field;
+      mode: Field;
+      channel: Field;
     };
     uplinkLeft: string;
     uplinkRight: string;
@@ -77,7 +79,10 @@ export type Dict = {
     titleAccent: string;
     intro: string;
     visit: string;
-    live: string;
+    filterLabel: string;
+    filters: { all: string; web: string; mobile: string; tool: string };
+    status: { live: string; offline: string; app: string; repo: string };
+    empty: string;
   };
   contact: {
     divider: string;
@@ -101,6 +106,7 @@ export type Dict = {
     signal: string;
     copyright: string;
   };
+  notFound: { code: string; title: string; desc: string; cta: string };
 };
 
 const dictionaries: Record<Locale, Dict> = {
@@ -108,11 +114,12 @@ const dictionaries: Record<Locale, Dict> = {
     htmlLang: "en",
     dir: "ltr",
     toggleLabel: "العربية",
+    toggleAria: "Switch to Arabic",
     nav: {
       about: "01 // ABOUT",
       skills: "02 // SKILLS",
       projects: "03 // PROJECTS",
-      contact: "04 // CONTACT",
+      contact: "02 // CONTACT",
       cta: "GET IN TOUCH",
       whatsapp: "WHATSAPP",
       skipNav: "Skip to content",
@@ -122,28 +129,28 @@ const dictionaries: Record<Locale, Dict> = {
     announcement: {
       text: "OPEN FOR PART-TIME & FREELANCE — REMOTE FROM AS SUWAYDA, SYRIA",
       action: "WHATSAPP",
+      dismiss: "Dismiss announcement",
     },
     hero: {
       chipAvailable: "// AVAILABLE PART-TIME",
-      chipRole: "FULLSTACK ENGINEER",
+      chipRole: "FULLSTACK DEVELOPER",
       chipRemote: "REMOTE",
       location: "AS SUWAYDA · SYRIA",
       title: "RAGHDKUN",
-      subtitle: "// FULLSTACK ENGINEER",
+      subtitle: "// FULLSTACK DEVELOPER",
       bio:
         "I build polished web and mobile interfaces — React/Next on the front, Laravel on the back — plus Python & Node scripts and AI workflows in n8n and Dify. Shipping production sites, dashboards, mobile apps and automations from As Suwayda, Syria.",
       ctaPrimary: "MESSAGE ON WHATSAPP",
-      ctaSecondary: "VIEW PROJECTS",
-      versionBadge: "v1.0 — 2026",
-      profileSubtitle: "OPERATOR PROFILE",
-      profileTitle: "RAGHDKUN",
+      ctaSecondary: "VIEW GITHUB",
+      profileSubtitle: "ENGAGEMENT BRIEF",
+      profileTitle: "WORKING WITH ME",
       fields: {
-        role: { label: "ROLE", value: "FULLSTACK ENGINEER" },
-        stack: { label: "STACK", value: "NEXT · LARAVEL · FLUTTER" },
-        extra: { label: "EXTRA", value: "AI FLOWS // n8n + DIFY" },
-        base: { label: "BASE", value: "AS SUWAYDA // SY" },
+        focus: { label: "FOCUS", value: "NEXT.JS · LARAVEL · AI FLOWS" },
+        openTo: { label: "OPEN TO", value: "PART-TIME · CONTRACT · FREELANCE" },
+        timezone: { label: "TIMEZONE", value: "UTC+3 · DAMASCUS" },
+        languages: { label: "LANGUAGES", value: "ENGLISH · ARABIC" },
+        mode: { label: "WORK MODE", value: "REMOTE · ASYNC-FRIENDLY" },
         channel: { label: "CHANNEL", value: "WHATSAPP +963 958 743 823" },
-        status: { label: "STATUS", value: "ACCEPTING PART-TIME WORK" },
       },
       uplinkLeft: "UPLINK // 00.HERO",
       uplinkRight: "STATUS — OPERATIONAL",
@@ -151,7 +158,7 @@ const dictionaries: Record<Locale, Dict> = {
       streamStatus: "DATA STREAM ONLINE",
     },
     marquee: [
-      "// FULLSTACK ENGINEER",
+      "// FULLSTACK DEVELOPER",
       "// AS SUWAYDA · SYRIA",
       "// REACT 19",
       "// NEXT 16",
@@ -161,6 +168,9 @@ const dictionaries: Record<Locale, Dict> = {
       "// FLUTTER",
       "// n8n · DIFY · AI FLOWS",
       "// PYTHON · NODE",
+      "// DEVOPS",
+      "// IT SOLUTIONS",
+      "// TECH MANAGEMENT",
       "// AVAILABLE PART-TIME",
     ],
     about: {
@@ -168,7 +178,7 @@ const dictionaries: Record<Locale, Dict> = {
       logTime: "RECORDED LOG // 24.04.2026",
       title: "Operator Brief",
       p1:
-        "Fullstack engineer based in As Suwayda, Syria. I work across web and mobile — Next.js, React, Tailwind, shadcn/ui, Laravel and Flutter — and I build AI workflows in n8n and Dify plus Python and Node automation scripts.",
+        "Fullstack developer based in As Suwayda, Syria. I work across web and mobile — Next.js, React, Tailwind, shadcn/ui, Laravel and Flutter — and I build AI workflows in n8n and Dify plus Python and Node automation scripts.",
       p2:
         "I care about typed APIs, design tokens, motion that respects the user, and shipping interfaces and backends that hold up under real traffic. Happy in solo-build or in-team roles.",
       bullet1: "Production sites, dashboards, mobile apps & automations",
@@ -191,6 +201,9 @@ const dictionaries: Record<Locale, Dict> = {
         "SCRIPTING",
         "DESIGN SYSTEMS",
         "MOBILE RUNTIMES",
+        "TECH MANAGEMENT",
+        "IT SOLUTIONS",
+        "DEVOPS",
       ],
       capabilityDescs: [
         "Next.js 16, React 19, Tailwind v4 — production-grade UI with measurable Core Web Vitals.",
@@ -199,6 +212,9 @@ const dictionaries: Record<Locale, Dict> = {
         "Python and Node.js scripts for scraping, ETL, internal tooling and one-off automations.",
         "Token-driven theming with shadcn/ui — every primitive ships with a story and an a11y baseline.",
         "Flutter + native bridges for fluid motion and offline-first behaviour across iOS and Android.",
+        "Scoping, planning and leading delivery — roadmaps, estimates, code reviews and keeping small teams shipping on schedule.",
+        "End-to-end business solutions — requirements, systems integration, internal tooling and the infrastructure behind them.",
+        "CI/CD pipelines, containerised deployments, monitoring and environment hardening so every release is uneventful.",
       ],
     },
     skills: {
@@ -227,12 +243,15 @@ const dictionaries: Record<Locale, Dict> = {
       title: "Selected",
       titleAccent: "Work",
       intro:
-        "Live products and shipped apps — click any tile to visit the deployed site or repo.",
+        "Live products and shipped apps — open any tile to visit the deployed site.",
       visit: "VISIT",
-      live: "LIVE",
+      filterLabel: "Filter projects by type",
+      filters: { all: "ALL", web: "WEB", mobile: "MOBILE", tool: "TOOLS" },
+      status: { live: "LIVE", offline: "OFFLINE", app: "APP", repo: "SOURCE" },
+      empty: "No projects in this category yet.",
     },
     contact: {
-      divider: "04 // CONTACT — OPEN CHANNEL",
+      divider: "02 // CONTACT — OPEN CHANNEL",
       ctaTitle: "LET'S BUILD SOMETHING.",
       ctaDesc:
         "Open to part-time, freelance or contract work — remote, async-friendly, based in As Suwayda. WhatsApp is the fastest way to reach me.",
@@ -247,7 +266,7 @@ const dictionaries: Record<Locale, Dict> = {
     },
     footer: {
       bio:
-        "Fullstack engineer · As Suwayda, Syria. Building polished web, mobile and AI-powered interfaces.",
+        "Fullstack developer · As Suwayda, Syria. Building polished web, mobile and AI-powered interfaces.",
       navigate: "NAVIGATE",
       channels: "CHANNELS",
       stack: "STACK",
@@ -255,17 +274,24 @@ const dictionaries: Record<Locale, Dict> = {
       signal: "SIGNAL",
       copyright: "ALL RIGHTS RESERVED",
     },
+    notFound: {
+      code: "ERR // 404 — SIGNAL LOST",
+      title: "Page not found",
+      desc: "The route you requested does not exist or has moved. Head back to the main console.",
+      cta: "BACK TO HOME",
+    },
   },
 
   ar: {
     htmlLang: "ar",
     dir: "rtl",
     toggleLabel: "EN",
+    toggleAria: "التبديل إلى الإنجليزية",
     nav: {
       about: "01 // نبذة",
       skills: "02 // المهارات",
       projects: "03 // المشاريع",
-      contact: "04 // تواصل",
+      contact: "02 // تواصل",
       cta: "تواصل معي",
       whatsapp: "واتساب",
       skipNav: "تخطّى إلى المحتوى",
@@ -275,28 +301,28 @@ const dictionaries: Record<Locale, Dict> = {
     announcement: {
       text: "متاح للعمل بدوام جزئي وعمل حر — عن بُعد من السويداء، سوريا",
       action: "واتساب",
+      dismiss: "إغلاق الإعلان",
     },
     hero: {
       chipAvailable: "// متاح بدوام جزئي",
-      chipRole: "مهندس فول-ستاك",
+      chipRole: "مطوّر فول-ستاك",
       chipRemote: "عن بُعد",
       location: "السويداء · سوريا",
       title: "RAGHDKUN",
-      subtitle: "// مهندس فول-ستاك",
+      subtitle: "// مطوّر فول-ستاك",
       bio:
         "أبني واجهات ويب وموبايل أنيقة — React/Next على الواجهة وLaravel على الخادم — بالإضافة إلى سكربتات Python وNode وأتمتة بالذكاء الاصطناعي عبر n8n وDify. أُطلق مواقع إنتاجية ولوحات تحكم وتطبيقات موبايل وأتمتة من السويداء، سوريا.",
       ctaPrimary: "راسلني عبر واتساب",
-      ctaSecondary: "اعرض المشاريع",
-      versionBadge: "v1.0 — 2026",
-      profileSubtitle: "ملف المشغّل",
-      profileTitle: "RAGHDKUN",
+      ctaSecondary: "اعرض GITHUB",
+      profileSubtitle: "ملخّص التعاون",
+      profileTitle: "العمل معي",
       fields: {
-        role: { label: "الدور", value: "مهندس فول-ستاك" },
-        stack: { label: "الستاك", value: "NEXT · LARAVEL · FLUTTER" },
-        extra: { label: "إضافي", value: "أتمتة الذكاء // n8n + DIFY" },
-        base: { label: "الموقع", value: "السويداء // سوريا" },
+        focus: { label: "التركيز", value: "NEXT.JS · LARAVEL · أتمتة ذكية" },
+        openTo: { label: "متاح لـ", value: "دوام جزئي · تعاقد · عمل حر" },
+        timezone: { label: "المنطقة الزمنية", value: "UTC+3 · دمشق" },
+        languages: { label: "اللغات", value: "الإنجليزية · العربية" },
+        mode: { label: "نمط العمل", value: "عن بُعد · غير متزامن" },
         channel: { label: "القناة", value: "واتساب 963958743823+" },
-        status: { label: "الحالة", value: "أقبل عملاً جزئياً" },
       },
       uplinkLeft: "اتصال // 00.HERO",
       uplinkRight: "الحالة — يعمل",
@@ -304,7 +330,7 @@ const dictionaries: Record<Locale, Dict> = {
       streamStatus: "البث متّصل",
     },
     marquee: [
-      "// مهندس فول-ستاك",
+      "// مطوّر فول-ستاك",
       "// السويداء · سوريا",
       "// REACT 19",
       "// NEXT 16",
@@ -314,6 +340,9 @@ const dictionaries: Record<Locale, Dict> = {
       "// FLUTTER",
       "// n8n · DIFY · أتمتة ذكية",
       "// PYTHON · NODE",
+      "// DEVOPS",
+      "// حلول تقنية",
+      "// إدارة تقنية",
       "// متاح بدوام جزئي",
     ],
     about: {
@@ -321,7 +350,7 @@ const dictionaries: Record<Locale, Dict> = {
       logTime: "سجل // 24.04.2026",
       title: "نبذة عن المشغّل",
       p1:
-        "مهندس فول-ستاك من السويداء، سوريا. أعمل على الويب والموبايل — Next.js وReact وTailwind وshadcn/ui وLaravel وFlutter — وأبني تدفقات ذكاء اصطناعي عبر n8n وDify إلى جانب سكربتات أتمتة بـ Python وNode.",
+        "مطوّر فول-ستاك من السويداء، سوريا. أعمل على الويب والموبايل — Next.js وReact وTailwind وshadcn/ui وLaravel وFlutter — وأبني تدفقات ذكاء اصطناعي عبر n8n وDify إلى جانب سكربتات أتمتة بـ Python وNode.",
       p2:
         "أهتم بـ APIs مكتوبة بأنواع صارمة، توكِنات تصميم متّسقة، حركة تحترم المستخدم، وواجهات وخوادم تصمد تحت ضغط الإنتاج. مرتاح في العمل المنفرد أو ضمن فريق.",
       bullet1: "مواقع إنتاجية، لوحات تحكم، تطبيقات موبايل وأتمتة",
@@ -344,6 +373,9 @@ const dictionaries: Record<Locale, Dict> = {
         "كتابة السكربتات",
         "أنظمة التصميم",
         "تشغيل الموبايل",
+        "إدارة تقنية",
+        "حلول تقنية",
+        "DevOps",
       ],
       capabilityDescs: [
         "Next.js 16 وReact 19 وTailwind v4 — واجهات بمستوى إنتاجي مع مؤشرات Core Web Vitals قابلة للقياس.",
@@ -352,6 +384,9 @@ const dictionaries: Record<Locale, Dict> = {
         "سكربتات Python وNode.js للسحب والـ ETL والأدوات الداخلية والأتمتة لمرة واحدة.",
         "تصميم بتوكِنات عبر shadcn/ui — كل مكوّن مع قصة وأساس وصولية.",
         "Flutter وجسور أصلية لحركة سلسة وعمل بدون اتصال على iOS وAndroid.",
+        "تحديد النطاق والتخطيط وقيادة التسليم — خرائط طريق، تقديرات، مراجعات كود، وإبقاء الفرق الصغيرة تُطلق في موعدها.",
+        "حلول أعمال متكاملة — تحليل المتطلبات، تكامل الأنظمة، أدوات داخلية، والبنية التحتية التي تشغّلها.",
+        "خطوط CI/CD، نشر بالحاويات، مراقبة وتحصين للبيئات لتكون كل إصدارة هادئة ومتوقّعة.",
       ],
     },
     skills: {
@@ -380,12 +415,15 @@ const dictionaries: Record<Locale, Dict> = {
       title: "مختارات من",
       titleAccent: "الأعمال",
       intro:
-        "منتجات حية وتطبيقات مُطلَقة — اضغط أي بطاقة لزيارة الموقع أو المستودع.",
+        "منتجات حية وتطبيقات مُطلَقة — افتح أي بطاقة لزيارة الموقع.",
       visit: "زيارة",
-      live: "حيّ",
+      filterLabel: "تصفية المشاريع حسب النوع",
+      filters: { all: "الكل", web: "ويب", mobile: "موبايل", tool: "أدوات" },
+      status: { live: "حيّ", offline: "غير متاح", app: "تطبيق", repo: "المصدر" },
+      empty: "لا مشاريع في هذه الفئة بعد.",
     },
     contact: {
-      divider: "04 // تواصل — قناة مفتوحة",
+      divider: "02 // تواصل — قناة مفتوحة",
       ctaTitle: "لنبني شيئاً معاً.",
       ctaDesc:
         "أقبل العمل الجزئي والحرّ والتعاقدي — عن بُعد، صديق للعمل غير المتزامن، من السويداء. واتساب هو الأسرع للوصول إليّ.",
@@ -400,13 +438,19 @@ const dictionaries: Record<Locale, Dict> = {
     },
     footer: {
       bio:
-        "مهندس فول-ستاك · السويداء، سوريا. أبني واجهات ويب وموبايل وذكاء اصطناعي أنيقة.",
+        "مطوّر فول-ستاك · السويداء، سوريا. أبني واجهات ويب وموبايل وذكاء اصطناعي أنيقة.",
       navigate: "تنقّل",
       channels: "قنوات",
       stack: "الستاك",
       end: "// نهاية السطر",
       signal: "إشارة",
       copyright: "جميع الحقوق محفوظة",
+    },
+    notFound: {
+      code: "خطأ // 404 — انقطعت الإشارة",
+      title: "الصفحة غير موجودة",
+      desc: "المسار المطلوب غير موجود أو تم نقله. عُد إلى الصفحة الرئيسية.",
+      cta: "العودة للرئيسية",
     },
   },
 };

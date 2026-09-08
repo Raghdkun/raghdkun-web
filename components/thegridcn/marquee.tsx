@@ -46,7 +46,10 @@ export function Marquee({
           <div
             key={copy}
             aria-hidden={copy === 1}
-            className="marquee-track absolute inset-y-0 flex shrink-0 items-center gap-4 pr-4 sm:gap-8 sm:pr-8"
+            // whitespace-nowrap on the track and every item: an absolutely positioned
+            // flex row shrink-wraps, so items with spaces would otherwise wrap inside
+            // the 16px-high track and render as garbled two-line fragments.
+            className="marquee-track absolute inset-y-0 flex shrink-0 items-center gap-4 whitespace-nowrap pr-4 will-change-transform sm:gap-8 sm:pr-8 [&>*]:shrink-0 [&>*]:whitespace-nowrap"
             style={{
               animation: `marqueeScroll ${dur} linear infinite`,
               animationDirection: dir,

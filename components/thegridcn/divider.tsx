@@ -72,7 +72,7 @@ export function Divider({
 
       {/* Label */}
       {label && (
-        <span className="mx-3 shrink-0 font-mono text-[9px] uppercase tracking-widest text-foreground/30">
+        <span className="mx-3 shrink-0 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/50 sm:tracking-widest">
           {label}
         </span>
       )}

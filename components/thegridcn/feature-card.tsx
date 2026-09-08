@@ -3,11 +3,13 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface FeatureCardProps extends React.HTMLAttributes<HTMLElement> {
   title: string
   description: string
   icon?: React.ReactNode
   variant?: "default" | "highlight"
+  /** When set, the whole card becomes a link (external links open in a new tab). */
+  href?: string
 }
 
 export function FeatureCard({
@@ -15,17 +17,25 @@ export function FeatureCard({
   description,
   icon,
   variant = "default",
+  href,
   className,
   ...props
 }: FeatureCardProps) {
+  const external = href?.startsWith("http")
+  const Comp: React.ElementType = href ? "a" : "div"
+
   return (
-    <div
+    <Comp
       data-slot="tron-feature-card"
+      {...(href
+        ? { href, target: external ? "_blank" : undefined, rel: external ? "noopener noreferrer" : undefined }
+        : {})}
       className={cn(
-        "group relative overflow-hidden rounded border bg-card/80 p-5 backdrop-blur-sm transition-all duration-300",
+        "group relative block overflow-hidden rounded border bg-card/80 p-5 backdrop-blur-sm transition-[border-color,box-shadow,transform] duration-300",
         variant === "highlight"
-          ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary-rgb,0,180,255),0.08)]"
+          ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary-rgb),0.08)]"
           : "border-primary/20 hover:border-primary/40",
+        href && "press cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
       {...props}
@@ -49,7 +59,7 @@ export function FeatureCard({
       </h3>
 
       {/* Description */}
-      <p className="mt-1.5 text-xs leading-relaxed text-foreground/60">
+      <p className="mt-1.5 text-xs leading-relaxed text-foreground/60 [overflow-wrap:anywhere]">
         {description}
       </p>
 
@@ -61,6 +71,6 @@ export function FeatureCard({
       <div className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r-2 border-t-2 border-primary/30 transition-colors duration-300 group-hover:border-primary/60" />
       <div className="pointer-events-none absolute bottom-0 left-0 h-3 w-3 border-b-2 border-l-2 border-primary/30 transition-colors duration-300 group-hover:border-primary/60" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 border-b-2 border-r-2 border-primary/30 transition-colors duration-300 group-hover:border-primary/60" />
-    </div>
+    </Comp>
   )
 }

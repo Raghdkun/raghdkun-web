@@ -41,42 +41,48 @@ body {
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 
 /* ============================================
    THEME: DEEP BLUE — Midnight + Electric Blue
+   Primary lifted from L 0.70 → 0.76 (≈ #449bff → #60b3ff)
+   for a brighter accent; contrast on --background ≈ 9.6:1.
    ============================================ */
 :root {
-  --primary: oklch(0.7 0.2 258);
-  --primary-foreground: oklch(0.08 0.04 260);
+  --primary: oklch(0.76 0.17 255);
+  --primary-foreground: oklch(0.10 0.045 260);
+  /* Legacy rgba(var(--primary-rgb), a) shadows in the GridCN primitives.
+     Kept in sync with --primary so glows never fall back to cyan. */
+  --primary-rgb: 96, 179, 255;
 
-  --secondary: oklch(0.2 0.06 258);
-  --secondary-foreground: oklch(0.96 0 0);
+  --secondary: oklch(0.22 0.06 256);
+  --secondary-foreground: oklch(0.96 0.02 240);
 
   --muted: oklch(0.17 0.045 258);
-  --muted-foreground: oklch(0.7 0.03 250);
+  --muted-foreground: oklch(0.72 0.03 250);
 
-  --accent: oklch(0.65 0.2 258);
-  --accent-foreground: oklch(0.08 0.04 260);
+  --accent: oklch(0.72 0.17 255);
+  --accent-foreground: oklch(0.10 0.045 260);
 
-  --border: oklch(0.4 0.14 258);
-  --input: oklch(0.22 0.07 258);
-  --ring: oklch(0.7 0.2 258);
+  --border: oklch(0.45 0.13 256);
+  --input: oklch(0.24 0.06 256);
+  --ring: oklch(0.76 0.17 255);
 
-  --glow: oklch(0.7 0.22 258);
-  --glow-muted: oklch(0.5 0.16 258);
+  --glow: oklch(0.76 0.19 255);
+  --glow-muted: oklch(0.55 0.15 256);
 
-  --chart-1: oklch(0.7 0.2 258);
-  --chart-2: oklch(0.65 0.18 240);
-  --chart-3: oklch(0.75 0.16 270);
-  --chart-4: oklch(0.6 0.22 250);
-  --chart-5: oklch(0.8 0.12 255);
+  --chart-1: oklch(0.76 0.17 255);
+  --chart-2: oklch(0.68 0.17 240);
+  --chart-3: oklch(0.78 0.14 268);
+  --chart-4: oklch(0.62 0.2 250);
+  --chart-5: oklch(0.84 0.1 255);
 
-  --sidebar-primary: oklch(0.7 0.2 258);
-  --sidebar-primary-foreground: oklch(0.08 0.04 260);
-  --sidebar-accent: oklch(0.2 0.06 258);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(0.4 0.14 258);
-  --sidebar-ring: oklch(0.7 0.2 258);
+  --sidebar-primary: oklch(0.76 0.17 255);
+  --sidebar-primary-foreground: oklch(0.10 0.045 260);
+  --sidebar-accent: oklch(0.22 0.06 256);
+  --sidebar-accent-foreground: oklch(0.96 0.02 240);
+  --sidebar-border: oklch(0.45 0.13 256);
+  --sidebar-ring: oklch(0.76 0.17 255);
 }
