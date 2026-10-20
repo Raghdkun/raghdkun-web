@@ -4,6 +4,7 @@ import "./globals.css";
 import SmoothScroller from "./components/SmoothScroller";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { LanguageProvider } from "./lib/i18n";
+import { SiteFooter, SiteHeader } from "./components/site-chrome";
 
 const SITE_URL = "https://raghdkun.dev";
 
@@ -122,7 +123,11 @@ export default function RootLayout({
             Skip to content
           </a>
           <ErrorBoundary>
-            <SmoothScroller>{children}</SmoothScroller>
+            <SmoothScroller>
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+            </SmoothScroller>
           </ErrorBoundary>
         </LanguageProvider>
       </body>

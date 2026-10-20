@@ -6,26 +6,21 @@ import {
   Briefcase,
   Code2,
   Container,
-  Languages,
   Mail,
   MapPin,
-  Menu,
   MessageCircle,
+  Send,
   Network,
   ServerCog,
   Smartphone,
   Sparkles,
   Workflow,
-  X,
-  Zap,
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { AnnouncementBar } from "@/components/thegridcn/announcement-bar";
 import { BentoGrid } from "@/components/thegridcn/bento-grid";
 import { Chip } from "@/components/thegridcn/chip";
 import { CTABanner } from "@/components/thegridcn/cta-banner";
@@ -38,48 +33,19 @@ import { Marquee } from "@/components/thegridcn/marquee";
 import { StatusBar, UplinkBar } from "@/components/thegridcn/status-bar";
 import { UplinkHeader } from "@/components/thegridcn/uplink-header";
 import { useLanguage } from "./lib/i18n";
+import { EMAIL, GITHUB_URL, INSTAGRAM_URL, WHATSAPP_URL } from "./lib/site";
+import { Github, Instagram } from "./components/icons";
 
-// ── Temporarily disabled sections. Re-enable: uncomment the imports and the two
-//    <SkillsSection /> / <ProjectsSection /> lines inside <main>, then restore the
-//    "skills" / "projects" entries in NAV_LINKS (and renumber nav/divider labels in i18n).
+// Skills is temporarily disabled. Re-enable: uncomment this import and the <SkillsSection />
+// line inside <main>, add a "skills" entry to NAV_LINKS in ./lib/site.ts.
 // import { SkillsSection } from "./sections/skills-section";
-// import { ProjectsSection } from "./sections/projects-section";
+import { ProjectsSection } from "./sections/projects-section";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-const WHATSAPP_URL = "https://wa.me/963958743823";
-const EMAIL = "raghdkun@gmail.com";
-const GITHUB_URL = "https://github.com/Raghdkun";
-const INSTAGRAM_URL = "https://instagram.com/raghdkun";
-
-// ───────────────────── Inline brand SVG icons ─────────────────────
-function Github({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.34.95.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.71 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.44-2.7 5.41-5.27 5.7.41.36.78 1.06.78 2.14 0 1.55-.01 2.79-.01 3.17 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.73 18.27.5 12 .5z" />
-    </svg>
-  );
-}
-
-function Instagram({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 const ICON = { className: "size-4", strokeWidth: 1.5 } as const;
-
-// Skills / Projects anchors intentionally omitted while those sections are disabled.
-const NAV_LINKS = [
-  { href: "#about", key: "about" as const },
-  { href: "#contact", key: "contact" as const },
-];
 
 // Order matches t.about.capabilityTitles / capabilityDescs
 const CAPABILITY_ICONS = [
@@ -136,48 +102,10 @@ function decodeReveal(el: HTMLElement) {
   });
 }
 
-/** Highlights the nav link for the section currently in the middle of the viewport. */
-function useActiveSection(ids: string[]) {
-  const [active, setActive] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
-    if (!els.length || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [ids]);
-  return active;
-}
-
-const SECTION_IDS = NAV_LINKS.map((l) => l.href.slice(1));
 
 export default function Home() {
-  const { locale, setLocale, t } = useLanguage();
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { locale, t } = useLanguage();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const activeSection = useActiveSection(SECTION_IDS);
-
-  React.useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
-
-  // Close the mobile menu on Escape
-  React.useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
-
-  const toggleLocale = () => setLocale(locale === "en" ? "ar" : "en");
 
   // ───────────── GSAP tech-reveal animations (re-runs on locale change) ─────────────
   useGSAP(
@@ -313,122 +241,8 @@ export default function Home() {
     { scope: rootRef, dependencies: [locale] },
   );
 
-  const localeToggle = (
-    <button
-      type="button"
-      onClick={toggleLocale}
-      aria-label={t.toggleAria}
-      lang={locale === "en" ? "ar" : "en"}
-      className="press inline-flex h-10 cursor-pointer items-center gap-1.5 rounded border border-primary/30 px-2.5 font-mono text-[11px] uppercase tracking-[0.2em] text-foreground/75 transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 md:h-9"
-    >
-      <Languages className="size-3.5" strokeWidth={1.5} />
-      {t.toggleLabel}
-    </button>
-  );
-
   return (
     <div className="relative" ref={rootRef}>
-      <AnnouncementBar
-        text={t.announcement.text}
-        variant="highlight"
-        icon={<Zap className="size-3" strokeWidth={1.5} />}
-        dismissLabel={t.announcement.dismiss}
-        action={{ label: t.announcement.action, href: WHATSAPP_URL }}
-      />
-
-      {/* ───────── NAVIGATION ───────── */}
-      <header className="sticky top-0 z-40 border-b border-primary/20 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <a href="#hero" className="group flex items-center gap-3 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60">
-            <div className="flex size-9 items-center justify-center rounded border border-primary/40 bg-primary/10 font-bold text-primary glow-border transition-all">
-              RK
-            </div>
-            <div className="hidden flex-col leading-tight sm:flex">
-              <span dir="ltr" className="text-[10px] uppercase tracking-[0.4em] text-foreground/60">
-                IDENTITY // 00.RK
-              </span>
-              <span dir="ltr" className="text-xs font-semibold uppercase tracking-widest text-primary">
-                RAGHDKUN
-              </span>
-            </div>
-          </a>
-
-          <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
-            {NAV_LINKS.map((link) => {
-              const isActive = activeSection === link.href.slice(1);
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  aria-current={isActive ? "location" : undefined}
-                  className={cn(
-                    "relative py-1 text-[10px] uppercase tracking-[0.3em] transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-                    "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-start after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out",
-                    isActive ? "text-primary after:scale-x-100" : "text-foreground/60",
-                  )}
-                >
-                  {t.nav[link.key]}
-                </a>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            {localeToggle}
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="hidden border-primary/40 text-primary lg:inline-flex"
-            >
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="size-3.5" strokeWidth={1.5} /> {t.nav.whatsapp}
-              </a>
-            </Button>
-            <Button asChild size="sm" className="hidden md:inline-flex">
-              <a href="#contact">{t.nav.cta}</a>
-            </Button>
-            <button
-              type="button"
-              aria-label={menuOpen ? t.nav.menuClose : t.nav.menuOpen}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-nav"
-              onClick={() => setMenuOpen((o) => !o)}
-              className="press flex size-10 cursor-pointer items-center justify-center rounded border border-primary/40 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 md:hidden"
-            >
-              {menuOpen ? <X className="size-4" strokeWidth={1.5} /> : <Menu className="size-4" strokeWidth={1.5} />}
-            </button>
-          </div>
-        </div>
-
-        {menuOpen && (
-          <div id="mobile-nav" className="border-t border-primary/20 bg-background/95 md:hidden">
-            <nav aria-label="Mobile" className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  aria-current={activeSection === link.href.slice(1) ? "location" : undefined}
-                  className="flex min-h-11 items-center rounded border border-transparent px-3 text-xs uppercase tracking-[0.3em] text-foreground/75 hover:border-primary/30 hover:text-primary aria-[current]:text-primary"
-                >
-                  {t.nav[link.key]}
-                </a>
-              ))}
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button asChild variant="outline" size="lg" className="border-primary/40 text-primary">
-                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>
-                    <MessageCircle className="size-4" strokeWidth={1.5} /> {t.nav.whatsapp}
-                  </a>
-                </Button>
-                <Button asChild size="lg">
-                  <a href="#contact" onClick={() => setMenuOpen(false)}>{t.nav.cta}</a>
-                </Button>
-              </div>
-            </nav>
-          </div>
-        )}
-      </header>
 
       <main id="main-content">
         {/* ───────── HERO ───────── */}
@@ -483,8 +297,8 @@ export default function Home() {
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full border-primary/40 sm:w-auto">
-                    <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-                      <Github className="size-4" /> {t.hero.ctaSecondary}
+                    <a href="#projects">
+                      <Send className="size-4" strokeWidth={1.5} /> {t.hero.ctaSecondary}
                     </a>
                   </Button>
                 </div>
@@ -628,8 +442,9 @@ export default function Home() {
           </div>
         </section>
 
+        <ProjectsSection />
+
         {/* <SkillsSection /> */}
-        {/* <ProjectsSection /> */}
 
         {/* ───────── CONTACT ───────── */}
         <section id="contact" className="relative border-t border-primary/10 py-16 sm:py-24">
@@ -679,75 +494,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* ───────── FOOTER ───────── */}
-      <footer className="relative border-t border-primary/20 bg-card/40">
-        <UplinkHeader
-          leftText={t.footer.end}
-          rightText={`${t.footer.signal} · ${new Date().getFullYear()}`}
-        />
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-          <div>
-            <div dir="ltr" className="font-display text-lg font-bold uppercase text-primary rtl:text-end">RAGHDKUN</div>
-            <p className="mt-2 max-w-[40ch] text-xs leading-relaxed text-foreground/60">{t.footer.bio}</p>
-            <div className="mt-4">{localeToggle}</div>
-          </div>
-          <nav aria-label="Footer">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/50">
-              {t.footer.navigate}
-            </div>
-            <ul className="mt-2 text-xs text-foreground/70">
-              {NAV_LINKS.map((l) => (
-                <li key={l.href}>
-                  <a href={l.href} className="inline-flex min-h-10 items-center hover:text-primary">{t.nav[l.key]}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/50">
-              {t.footer.channels}
-            </div>
-            <ul className="mt-2 text-xs text-foreground/70">
-              <li>
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center hover:text-primary">
-                  WhatsApp — +963 958 743 823
-                </a>
-              </li>
-              <li>
-                <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center hover:text-primary">
-                  Instagram — @raghdkun
-                </a>
-              </li>
-              <li>
-                <a href={`mailto:${EMAIL}`} className="inline-flex min-h-10 items-center hover:text-primary">
-                  {EMAIL}
-                </a>
-              </li>
-              <li>
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center hover:text-primary">
-                  GitHub — @Raghdkun
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/50">
-              {t.footer.stack}
-            </div>
-            <ul className="mt-3 space-y-1.5 text-xs text-foreground/70">
-              <li>Next.js 16 // React 19</li>
-              <li>Tailwind v4 // shadcn/ui</li>
-              <li>Laravel // PHP // Postgres</li>
-              <li>Flutter // Dart</li>
-              <li>n8n // Dify // Python // Node</li>
-              <li>DevOps // CI/CD // IT Solutions</li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-primary/10 px-4 py-4 text-center text-[10px] uppercase tracking-[0.3em] text-foreground/40 sm:px-6 lg:px-8">
-          © {new Date().getFullYear()} RAGHDKUN — {t.footer.copyright}
-        </div>
-      </footer>
     </div>
   );
 }

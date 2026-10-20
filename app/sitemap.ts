@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { readdirSync, statSync } from "fs";
 import { join } from "path";
+import { PROJECTS } from "@/lib/projects";
 
 const BASE_URL = "https://raghdkun.dev";
 
@@ -9,7 +10,8 @@ function discoverRoutes(dir: string, prefix = ""): string[] {
 
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.name.startsWith("_") || entry.name.startsWith(".")) continue;
-    if (entry.name === "components" || entry.name === "api") continue;
+    if (entry.name === "components" || entry.name === "api" || entry.name === "sections" || entry.name === "lib") continue;
+    if (entry.name.startsWith("[")) continue; // dynamic segments are listed explicitly below
 
     const fullPath = join(dir, entry.name);
 
@@ -62,6 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = discoverRoutes(appDir);
 
   if (!routes.includes("/")) routes.unshift("/");
+  for (const p of PROJECTS) routes.push(`/projects/${p.slug}`);
 
   return routes.map((route) => ({
     url: `${BASE_URL}${route === "/" ? "" : route}`,

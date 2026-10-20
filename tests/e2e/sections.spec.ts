@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-// Skills and Projects sections are temporarily disabled (see app/page.tsx);
-// their assertions are commented below so they can be restored with the sections.
+// The Skills section is temporarily disabled (see app/page.tsx); its assertion is
+// commented below so it can be restored with the section.
 
 test.describe("RAGHDKUN landing", () => {
   test.beforeEach(async ({ page }) => {
@@ -18,11 +18,10 @@ test.describe("RAGHDKUN landing", () => {
   });
 
   test("renders all primary sections", async ({ page }) => {
-    for (const id of ["#hero", "#about", "#contact"]) {
+    for (const id of ["#hero", "#about", "#projects", "#contact"]) {
       await expect(page.locator(id)).toBeVisible();
     }
     await expect(page.locator("#skills")).toHaveCount(0);
-    await expect(page.locator("#projects")).toHaveCount(0);
   });
 
   test("announcement bar is present", async ({ page }) => {
@@ -45,13 +44,14 @@ test.describe("RAGHDKUN landing", () => {
   //   await expect(skills).toContainText(/REACT|TYPESCRIPT/i);
   // });
 
-  // test("projects section lists real projects", async ({ page }) => {
-  //   const projects = page.locator("#projects");
-  //   await projects.scrollIntoViewIfNeeded();
-  //   await expect(projects).toContainText(/Trucking360/i);
-  //   await expect(projects).toContainText(/GoSimple/i);
-  //   await expect(projects).toContainText(/Wavlet/i);
-  // });
+  test("projects section links to the Doghri case study", async ({ page }) => {
+    const projects = page.locator("#projects");
+    await projects.scrollIntoViewIfNeeded();
+    await expect(projects).toContainText(/Doghri/i);
+    await projects.getByRole("link", { name: /doghri/i }).first().click();
+    await expect(page).toHaveURL(/\/projects\/doghri$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Doghri/i);
+  });
 
   test("contact section shows whatsapp + instagram + email + github", async ({ page }) => {
     const contact = page.locator("#contact");
@@ -68,7 +68,7 @@ test.describe("RAGHDKUN landing", () => {
   });
 
   test("nav anchors scroll to targets", async ({ page }) => {
-    await page.getByRole("link", { name: /02 \/\/ CONTACT/i }).first().click();
+    await page.getByRole("link", { name: /03 \/\/ CONTACT/i }).first().click();
     await expect(page).toHaveURL(/#contact$/);
   });
 

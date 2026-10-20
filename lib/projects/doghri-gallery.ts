@@ -1,0 +1,130 @@
+import type { GalleryGroup, ImageAsset } from "./types";
+
+// Generated from the Doghri portfolio pack (screenshots are test data from the running app).
+export const doghriCover: ImageAsset = { src: "/projects/doghri/showcase/01-ride-flow-arabic.webp", w: 2000, h: 901, alt: { en: "The ride flow, in Arabic", ar: "رحلة الراكب بالعربية" } };
+
+export const doghriShowcase: { phones: ImageAsset[]; desktop: ImageAsset } = {
+  phones: [
+    { src: "/projects/doghri/ar/14-choose-a-ride.webp", w: 640, h: 1436, alt: { en: "Choose a ride, with fare ranges", ar: "اختيار نوع الرحلة مع نطاق الأجرة" } },
+    { src: "/projects/doghri/ar/20-live-trip.webp", w: 640, h: 1436, alt: { en: "Live trip tracking", ar: "تتبّع الرحلة مباشرة" } },
+    { src: "/projects/doghri/ar/28-receipt.webp", w: 640, h: 1436, alt: { en: "Receipt with fare breakdown", ar: "الإيصال وتفاصيل الأجرة" } },
+  ],
+  desktop: { src: "/projects/doghri/dashboard/01-overview.webp", w: 1800, h: 1125, alt: { en: "Operations overview and live map", ar: "نظرة عامة على العمليات والخريطة المباشرة" } },
+};
+
+export const doghriGallery: GalleryGroup[] = [
+  {
+    id: "showcase",
+    label: { en: "Showcase", ar: "لقطات مركّبة" },
+    layout: "collage",
+    images: [
+      { src: "/projects/doghri/showcase/01-ride-flow-arabic.webp", w: 2000, h: 901, alt: { en: "The ride flow, in Arabic", ar: "رحلة الراكب بالعربية" } },
+      { src: "/projects/doghri/showcase/02-bilingual-ltr-rtl.webp", w: 2000, h: 1114, alt: { en: "Arabic RTL and English LTR, side by side", ar: "العربية RTL والإنجليزية LTR جنباً إلى جنب" } },
+      { src: "/projects/doghri/showcase/03-dark-mode.webp", w: 2000, h: 1114, alt: { en: "Dark mode", ar: "الوضع الداكن" } },
+      { src: "/projects/doghri/showcase/04-safety.webp", w: 1924, h: 1404, alt: { en: "Safety: share trip, SOS, live link", ar: "السلامة: مشاركة الرحلة والطوارئ والرابط المباشر" } },
+      { src: "/projects/doghri/showcase/05-first-run.webp", w: 2000, h: 1114, alt: { en: "First run", ar: "أول تشغيل" } },
+      { src: "/projects/doghri/showcase/06-rating-receipt-states.webp", w: 2000, h: 1114, alt: { en: "Rating, receipt and edge states", ar: "التقييم والإيصال والحالات الحدّية" } },
+    ],
+  },
+  {
+    id: "ar",
+    label: { en: "Rider app, Arabic (default)", ar: "تطبيق الراكب بالعربية (الافتراضي)" },
+    layout: "phone",
+    images: [
+      { src: "/projects/doghri/ar/02-language-ar.webp", w: 640, h: 1436, alt: { en: "Choose a language", ar: "اختيار اللغة" } },
+      { src: "/projects/doghri/ar/03-onboarding-1.webp", w: 640, h: 1436, alt: { en: "Onboarding 1", ar: "التعريف 1" } },
+      { src: "/projects/doghri/ar/04-onboarding-2.webp", w: 640, h: 1436, alt: { en: "Onboarding 2", ar: "التعريف 2" } },
+      { src: "/projects/doghri/ar/05-onboarding-3.webp", w: 640, h: 1436, alt: { en: "Onboarding 3", ar: "التعريف 3" } },
+      { src: "/projects/doghri/ar/06-location.webp", w: 640, h: 1436, alt: { en: "Location permission", ar: "إذن الموقع" } },
+      { src: "/projects/doghri/ar/07-sign-in.webp", w: 640, h: 1436, alt: { en: "Sign in with a phone number", ar: "تسجيل الدخول برقم الهاتف" } },
+      { src: "/projects/doghri/ar/08-code.webp", w: 640, h: 1436, alt: { en: "Verification code", ar: "رمز التحقق" } },
+      { src: "/projects/doghri/ar/09-photo.webp", w: 640, h: 1436, alt: { en: "Profile photo", ar: "الصورة الشخصية" } },
+      { src: "/projects/doghri/ar/10-home-coach-mark.webp", w: 640, h: 1436, alt: { en: "Home with coach mark", ar: "الرئيسية مع إرشاد" } },
+      { src: "/projects/doghri/ar/11-home.webp", w: 640, h: 1436, alt: { en: "Home", ar: "الرئيسية" } },
+      { src: "/projects/doghri/ar/13-pick-on-map.webp", w: 640, h: 1436, alt: { en: "Pick on the map", ar: "اختيار من الخريطة" } },
+      { src: "/projects/doghri/ar/14-choose-a-ride.webp", w: 640, h: 1436, alt: { en: "Choose a ride, with fare ranges", ar: "اختيار نوع الرحلة مع نطاق الأجرة" } },
+      { src: "/projects/doghri/ar/15-finding-captain.webp", w: 640, h: 1436, alt: { en: "Finding a captain", ar: "البحث عن كابتن" } },
+      { src: "/projects/doghri/ar/16-no-captain.webp", w: 640, h: 1436, alt: { en: "No captain available", ar: "لا يوجد كابتن متاح" } },
+      { src: "/projects/doghri/ar/17-captain-on-the-way.webp", w: 640, h: 1436, alt: { en: "Captain on the way", ar: "الكابتن في الطريق" } },
+      { src: "/projects/doghri/ar/18-chat.webp", w: 640, h: 1436, alt: { en: "In-trip chat", ar: "المراسلة أثناء الرحلة" } },
+      { src: "/projects/doghri/ar/19-call-sheet.webp", w: 640, h: 1436, alt: { en: "Call sheet, number never shown", ar: "الاتصال دون إظهار الرقم" } },
+      { src: "/projects/doghri/ar/20-live-trip.webp", w: 640, h: 1436, alt: { en: "Live trip tracking", ar: "تتبّع الرحلة مباشرة" } },
+      { src: "/projects/doghri/ar/21-share-trip.webp", w: 640, h: 1436, alt: { en: "Share the trip", ar: "مشاركة الرحلة" } },
+      { src: "/projects/doghri/ar/22-sos.webp", w: 640, h: 1436, alt: { en: "SOS sheet", ar: "نافذة الطوارئ" } },
+      { src: "/projects/doghri/ar/25-trip-completed.webp", w: 640, h: 1436, alt: { en: "Trip completed", ar: "اكتملت الرحلة" } },
+      { src: "/projects/doghri/ar/26-rating.webp", w: 640, h: 1436, alt: { en: "Rate the captain", ar: "تقييم الكابتن" } },
+      { src: "/projects/doghri/ar/26b-rated.webp", w: 640, h: 1436, alt: { en: "Rated", ar: "تم التقييم" } },
+      { src: "/projects/doghri/ar/27-weak-signal-banner.webp", w: 640, h: 1436, alt: { en: "Weak-signal banner", ar: "تنبيه ضعف الإشارة" } },
+      { src: "/projects/doghri/ar/28-receipt.webp", w: 640, h: 1436, alt: { en: "Receipt with fare breakdown", ar: "الإيصال وتفاصيل الأجرة" } },
+      { src: "/projects/doghri/brand/01-splash.webp", w: 640, h: 1436, alt: { en: "Splash screen", ar: "شاشة البداية" } },
+    ],
+  },
+  {
+    id: "en",
+    label: { en: "Rider app, English", ar: "تطبيق الراكب بالإنجليزية" },
+    layout: "phone",
+    images: [
+      { src: "/projects/doghri/en/02-language.webp", w: 640, h: 1436, alt: { en: "Choose a language", ar: "اختيار اللغة" } },
+      { src: "/projects/doghri/en/03-onboarding-1.webp", w: 640, h: 1436, alt: { en: "Onboarding 1", ar: "التعريف 1" } },
+      { src: "/projects/doghri/en/04-onboarding-2.webp", w: 640, h: 1436, alt: { en: "Onboarding 2", ar: "التعريف 2" } },
+      { src: "/projects/doghri/en/05-onboarding-3.webp", w: 640, h: 1436, alt: { en: "Onboarding 3", ar: "التعريف 3" } },
+      { src: "/projects/doghri/en/07-sign-in.webp", w: 640, h: 1436, alt: { en: "Sign in with a phone number", ar: "تسجيل الدخول برقم الهاتف" } },
+      { src: "/projects/doghri/en/08-code.webp", w: 640, h: 1436, alt: { en: "Verification code", ar: "رمز التحقق" } },
+      { src: "/projects/doghri/en/10-home-coach-mark.webp", w: 640, h: 1436, alt: { en: "Home with coach mark", ar: "الرئيسية مع إرشاد" } },
+      { src: "/projects/doghri/en/11-home.webp", w: 640, h: 1436, alt: { en: "Home", ar: "الرئيسية" } },
+      { src: "/projects/doghri/en/14-choose-a-ride.webp", w: 640, h: 1436, alt: { en: "Choose a ride, with fare ranges", ar: "اختيار نوع الرحلة مع نطاق الأجرة" } },
+      { src: "/projects/doghri/en/17-captain-on-the-way.webp", w: 640, h: 1436, alt: { en: "Captain on the way", ar: "الكابتن في الطريق" } },
+      { src: "/projects/doghri/en/20-live-trip.webp", w: 640, h: 1436, alt: { en: "Live trip tracking", ar: "تتبّع الرحلة مباشرة" } },
+      { src: "/projects/doghri/en/25-trip-completed.webp", w: 640, h: 1436, alt: { en: "Trip completed", ar: "اكتملت الرحلة" } },
+      { src: "/projects/doghri/en/26-rating.webp", w: 640, h: 1436, alt: { en: "Rate the captain", ar: "تقييم الكابتن" } },
+      { src: "/projects/doghri/en/28-receipt.webp", w: 640, h: 1436, alt: { en: "Receipt with fare breakdown", ar: "الإيصال وتفاصيل الأجرة" } },
+    ],
+  },
+  {
+    id: "dark",
+    label: { en: "Rider app, dark mode", ar: "تطبيق الراكب، الوضع الداكن" },
+    layout: "phone",
+    images: [
+      { src: "/projects/doghri/dark/11-home.webp", w: 640, h: 1436, alt: { en: "Home", ar: "الرئيسية" } },
+      { src: "/projects/doghri/dark/12-planner.webp", w: 640, h: 1436, alt: { en: "Trip planner", ar: "مخطط الرحلة" } },
+      { src: "/projects/doghri/dark/13-pick-on-map.webp", w: 640, h: 1436, alt: { en: "Pick on the map", ar: "اختيار من الخريطة" } },
+      { src: "/projects/doghri/dark/14-choose-a-ride.webp", w: 640, h: 1436, alt: { en: "Choose a ride, with fare ranges", ar: "اختيار نوع الرحلة مع نطاق الأجرة" } },
+      { src: "/projects/doghri/dark/25-trip-completed.webp", w: 640, h: 1436, alt: { en: "Trip completed", ar: "اكتملت الرحلة" } },
+      { src: "/projects/doghri/dark/28-receipt.webp", w: 640, h: 1436, alt: { en: "Receipt with fare breakdown", ar: "الإيصال وتفاصيل الأجرة" } },
+    ],
+  },
+  {
+    id: "dashboard",
+    label: { en: "Operations dashboard", ar: "لوحة العمليات" },
+    layout: "desktop",
+    images: [
+      { src: "/projects/doghri/dashboard/01-overview.webp", w: 1800, h: 1125, alt: { en: "Operations overview and live map", ar: "نظرة عامة على العمليات والخريطة المباشرة" } },
+      { src: "/projects/doghri/dashboard/02-trip-detail.webp", w: 1800, h: 2010, alt: { en: "Trip detail and fare audit", ar: "تفاصيل الرحلة وتدقيق الأجرة" } },
+      { src: "/projects/doghri/dashboard/03-route-replay.webp", w: 1800, h: 1125, alt: { en: "GPS route replay", ar: "إعادة عرض مسار GPS" } },
+      { src: "/projects/doghri/dashboard/04-fare-rules.webp", w: 1800, h: 1810, alt: { en: "Versioned fare rules", ar: "قواعد الأجرة بإصدارات" } },
+      { src: "/projects/doghri/dashboard/04b-fare-simulator.webp", w: 1800, h: 1125, alt: { en: "Fare simulator", ar: "محاكي الأجرة" } },
+      { src: "/projects/doghri/dashboard/05-fuel-prices.webp", w: 1800, h: 1228, alt: { en: "Fuel prices with impact preview", ar: "أسعار الوقود مع معاينة الأثر" } },
+      { src: "/projects/doghri/dashboard/06-app-control-modules.webp", w: 1800, h: 1125, alt: { en: "App control: modules and features", ar: "التحكم بالتطبيق: الوحدات والميزات" } },
+      { src: "/projects/doghri/dashboard/07-theme-editor.webp", w: 1800, h: 1125, alt: { en: "Theme editor", ar: "محرر الثيم" } },
+      { src: "/projects/doghri/dashboard/08-notification-templates.webp", w: 1800, h: 1125, alt: { en: "Notification templates, AR/EN", ar: "قوالب الإشعارات AR/EN" } },
+      { src: "/projects/doghri/dashboard/09-promotion-builder.webp", w: 1800, h: 1622, alt: { en: "Promotion builder", ar: "منشئ العروض" } },
+    ],
+  },
+  {
+    id: "share",
+    label: { en: "Share page, desktop", ar: "صفحة المشاركة، سطح المكتب" },
+    layout: "desktop",
+    images: [
+      { src: "/projects/doghri/web/24-shared-trip-web-desktop.webp", w: 1800, h: 1125, alt: { en: "Public share page, desktop", ar: "صفحة المشاركة العامة، سطح المكتب" } },
+    ],
+  },
+  {
+    id: "share-mobile",
+    label: { en: "Share page, mobile", ar: "صفحة المشاركة، موبايل" },
+    layout: "phone",
+    images: [
+      { src: "/projects/doghri/web/23-shared-trip-web-mobile-dark.webp", w: 780, h: 1688, alt: { en: "Public share page, mobile dark", ar: "صفحة المشاركة العامة، موبايل داكن" } },
+      { src: "/projects/doghri/web/23-shared-trip-web-mobile.webp", w: 1170, h: 2532, alt: { en: "Public share page, mobile", ar: "صفحة المشاركة العامة، موبايل" } },
+    ],
+  },
+];

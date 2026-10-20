@@ -78,11 +78,24 @@ export type Dict = {
     title: string;
     titleAccent: string;
     intro: string;
-    visit: string;
+    viewCase: string;
+    viewAll: string;
+    back: string;
+    featured: string;
     filterLabel: string;
-    filters: { all: string; web: string; mobile: string; tool: string };
-    status: { live: string; offline: string; app: string; repo: string };
+    filters: { all: string; mobile: string; web: string; platform: string };
+    kinds: { mobile: string; web: string; platform: string };
+    statuses: { live: string; building: string; shipped: string; "open-source": string };
+    meta: { role: string; year: string; status: string; type: string };
+    sections: { overview: string; highlights: string; gallery: string; stack: string };
+    openLive: string;
+    openRepo: string;
+    prev: string;
+    next: string;
     empty: string;
+    lightbox: { open: string; close: string; prev: string; next: string; counter: string };
+    ctaTitle: string;
+    ctaDesc: string;
   };
   contact: {
     divider: string;
@@ -117,9 +130,9 @@ const dictionaries: Record<Locale, Dict> = {
     toggleAria: "Switch to Arabic",
     nav: {
       about: "01 // ABOUT",
-      skills: "02 // SKILLS",
-      projects: "03 // PROJECTS",
-      contact: "02 // CONTACT",
+      skills: "04 // SKILLS",
+      projects: "02 // PROJECTS",
+      contact: "03 // CONTACT",
       cta: "GET IN TOUCH",
       whatsapp: "WHATSAPP",
       skipNav: "Skip to content",
@@ -141,7 +154,7 @@ const dictionaries: Record<Locale, Dict> = {
       bio:
         "I build polished web and mobile interfaces — React/Next on the front, Laravel on the back — plus Python & Node scripts and AI workflows in n8n and Dify. Shipping production sites, dashboards, mobile apps and automations from As Suwayda, Syria.",
       ctaPrimary: "MESSAGE ON WHATSAPP",
-      ctaSecondary: "VIEW GITHUB",
+      ctaSecondary: "VIEW PROJECTS",
       profileSubtitle: "ENGAGEMENT BRIEF",
       profileTitle: "WORKING WITH ME",
       fields: {
@@ -218,7 +231,7 @@ const dictionaries: Record<Locale, Dict> = {
       ],
     },
     skills: {
-      divider: "02 // SKILLS — POWER DISTRIBUTION",
+      divider: "04 // SKILLS — POWER DISTRIBUTION",
       title: "Discipline Matrix",
       intro: "Calibrated against shipped product weight — not raw years.",
       skillLabels: [
@@ -239,19 +252,31 @@ const dictionaries: Record<Locale, Dict> = {
       ],
     },
     projects: {
-      divider: "03 // PROJECTS — DEPLOYED ASSETS",
+      divider: "02 // PROJECTS — SELECTED WORK",
       title: "Selected",
       titleAccent: "Work",
-      intro:
-        "Live products and shipped apps — open any tile to visit the deployed site.",
-      visit: "VISIT",
+      intro: "Products I have built end to end, from mobile apps to dashboards and marketing sites. Open any project for the case study.",
+      viewCase: "CASE STUDY",
+      viewAll: "ALL PROJECTS",
+      back: "ALL PROJECTS",
+      featured: "FEATURED",
       filterLabel: "Filter projects by type",
-      filters: { all: "ALL", web: "WEB", mobile: "MOBILE", tool: "TOOLS" },
-      status: { live: "LIVE", offline: "OFFLINE", app: "APP", repo: "SOURCE" },
+      filters: { all: "ALL", mobile: "MOBILE", web: "WEB", platform: "PLATFORMS" },
+      kinds: { mobile: "MOBILE APP", web: "WEBSITE", platform: "PLATFORM" },
+      statuses: { live: "LIVE", building: "IN DEVELOPMENT", shipped: "SHIPPED", "open-source": "OPEN SOURCE" },
+      meta: { role: "ROLE", year: "YEAR", status: "STATUS", type: "TYPE" },
+      sections: { overview: "OVERVIEW", highlights: "WHAT IT DOES", gallery: "SCREENS", stack: "BUILT WITH" },
+      openLive: "VISIT LIVE SITE",
+      openRepo: "VIEW SOURCE",
+      prev: "PREVIOUS",
+      next: "NEXT",
       empty: "No projects in this category yet.",
+      lightbox: { open: "Open image", close: "Close", prev: "Previous image", next: "Next image", counter: "Image {n} of {total}" },
+      ctaTitle: "HAVE SOMETHING SIMILAR IN MIND?",
+      ctaDesc: "Tell me what you are building. WhatsApp is the fastest way to reach me.",
     },
     contact: {
-      divider: "02 // CONTACT — OPEN CHANNEL",
+      divider: "03 // CONTACT — OPEN CHANNEL",
       ctaTitle: "LET'S BUILD SOMETHING.",
       ctaDesc:
         "Open to part-time, freelance or contract work — remote, async-friendly, based in As Suwayda. WhatsApp is the fastest way to reach me.",
@@ -289,9 +314,9 @@ const dictionaries: Record<Locale, Dict> = {
     toggleAria: "التبديل إلى الإنجليزية",
     nav: {
       about: "01 // نبذة",
-      skills: "02 // المهارات",
-      projects: "03 // المشاريع",
-      contact: "02 // تواصل",
+      skills: "04 // المهارات",
+      projects: "02 // المشاريع",
+      contact: "03 // تواصل",
       cta: "تواصل معي",
       whatsapp: "واتساب",
       skipNav: "تخطّى إلى المحتوى",
@@ -313,7 +338,7 @@ const dictionaries: Record<Locale, Dict> = {
       bio:
         "أبني واجهات ويب وموبايل أنيقة — React/Next على الواجهة وLaravel على الخادم — بالإضافة إلى سكربتات Python وNode وأتمتة بالذكاء الاصطناعي عبر n8n وDify. أُطلق مواقع إنتاجية ولوحات تحكم وتطبيقات موبايل وأتمتة من السويداء، سوريا.",
       ctaPrimary: "راسلني عبر واتساب",
-      ctaSecondary: "اعرض GITHUB",
+      ctaSecondary: "اعرض المشاريع",
       profileSubtitle: "ملخّص التعاون",
       profileTitle: "العمل معي",
       fields: {
@@ -390,7 +415,7 @@ const dictionaries: Record<Locale, Dict> = {
       ],
     },
     skills: {
-      divider: "02 // المهارات — توزيع الطاقة",
+      divider: "04 // المهارات — توزيع الطاقة",
       title: "مصفوفة الاختصاصات",
       intro: "مُعايَرة على وزن المنتجات المُطلَقة — لا على عدد السنوات.",
       skillLabels: [
@@ -411,19 +436,31 @@ const dictionaries: Record<Locale, Dict> = {
       ],
     },
     projects: {
-      divider: "03 // المشاريع — أصول مُطلَقة",
+      divider: "02 // المشاريع — أعمال مختارة",
       title: "مختارات من",
       titleAccent: "الأعمال",
-      intro:
-        "منتجات حية وتطبيقات مُطلَقة — افتح أي بطاقة لزيارة الموقع.",
-      visit: "زيارة",
+      intro: "منتجات بنيتها من البداية إلى النهاية، من تطبيقات الموبايل إلى لوحات التحكم والمواقع التسويقية. افتح أي مشروع لدراسة الحالة.",
+      viewCase: "دراسة الحالة",
+      viewAll: "كل المشاريع",
+      back: "كل المشاريع",
+      featured: "مميّز",
       filterLabel: "تصفية المشاريع حسب النوع",
-      filters: { all: "الكل", web: "ويب", mobile: "موبايل", tool: "أدوات" },
-      status: { live: "حيّ", offline: "غير متاح", app: "تطبيق", repo: "المصدر" },
+      filters: { all: "الكل", mobile: "موبايل", web: "ويب", platform: "منصّات" },
+      kinds: { mobile: "تطبيق موبايل", web: "موقع", platform: "منصّة" },
+      statuses: { live: "حيّ", building: "قيد التطوير", shipped: "مُطلَق", "open-source": "مفتوح المصدر" },
+      meta: { role: "الدور", year: "السنة", status: "الحالة", type: "النوع" },
+      sections: { overview: "نظرة عامة", highlights: "ماذا يفعل", gallery: "الشاشات", stack: "بُني بـ" },
+      openLive: "زيارة الموقع",
+      openRepo: "عرض الشيفرة",
+      prev: "السابق",
+      next: "التالي",
       empty: "لا مشاريع في هذه الفئة بعد.",
+      lightbox: { open: "فتح الصورة", close: "إغلاق", prev: "الصورة السابقة", next: "الصورة التالية", counter: "الصورة {n} من {total}" },
+      ctaTitle: "لديك فكرة مشابهة؟",
+      ctaDesc: "أخبرني ماذا تبني. واتساب هو الأسرع للوصول إليّ.",
     },
     contact: {
-      divider: "02 // تواصل — قناة مفتوحة",
+      divider: "03 // تواصل — قناة مفتوحة",
       ctaTitle: "لنبني شيئاً معاً.",
       ctaDesc:
         "أقبل العمل الجزئي والحرّ والتعاقدي — عن بُعد، صديق للعمل غير المتزامن، من السويداء. واتساب هو الأسرع للوصول إليّ.",

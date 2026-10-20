@@ -196,3 +196,23 @@ html[dir="rtl"] .font-display {
 html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6, [class*="tracking-"]):not([dir="ltr"]) {
   letter-spacing: 0 !important;
 }
+
+/* ── Case-study page motion: CSS-only so content is visible without JS ── */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal-in {
+  animation: reveal-up 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+@supports (animation-timeline: view()) {
+  .reveal-view {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-in, .reveal-view { animation: none; }
+}

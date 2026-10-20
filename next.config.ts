@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     // Exact `search` values are required (Next 16) to prevent optimizer URL enumeration.
     localPatterns: [
       { pathname: "/images/**", search: "" },
-      { pathname: "/images/**", search: "?v=2" },
+      { pathname: "/projects/**", search: "" },
     ],
     remotePatterns: [
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
